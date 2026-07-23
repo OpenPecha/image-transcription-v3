@@ -91,7 +91,7 @@ export interface AssignTaskRequest {
 // Task orientation type
 export type TaskOrientation = 'landscape' | 'portrait'
 
-// ITV2 task states returned by the assign endpoint
+// ITV3 task states returned by the assign endpoint
 export type AssignedTaskState =
   | 'pending'
   | 'annotating'
@@ -106,7 +106,7 @@ export type AssignedTaskState =
   | 'finalised'
   | 'trashed'
 
-export const ITV2_EDITABLE_TASK_STATES = [
+export const ITV3_EDITABLE_TASK_STATES = [
   'annotating',
   'annotating_b',
   'reviewing',
@@ -114,18 +114,18 @@ export const ITV2_EDITABLE_TASK_STATES = [
 ] as const satisfies readonly AssignedTaskState[]
 
 /** Reviewer A/B slots — approve/submit is allowed only in these states. */
-export const ITV2_REVIEWER_APPROVABLE_STATES = [
+export const ITV3_REVIEWER_APPROVABLE_STATES = [
   'reviewing',
   'reviewing_b',
 ] as const satisfies readonly AssignedTaskState[]
 
 /** Final Reviewer slot — approve/submit is allowed only in this state. */
-export const ITV2_FINAL_REVIEWER_APPROVABLE_STATES = [
+export const ITV3_FINAL_REVIEWER_APPROVABLE_STATES = [
   'finalising',
 ] as const satisfies readonly AssignedTaskState[]
 
 export function isEditableTaskState(state: AssignedTaskState): boolean {
-  return (ITV2_EDITABLE_TASK_STATES as readonly string[]).includes(state)
+  return (ITV3_EDITABLE_TASK_STATES as readonly string[]).includes(state)
 }
 
 /** Annotator A slot — only this slot may trash/reject a task. */

@@ -1,5 +1,5 @@
 /**
- * Slot reject scope for ITV2 submit=false:
+ * Slot reject scope for ITV3 submit=false:
  * - Reviewer in `reviewing`: 1 = Annotator A, 2 = Annotator B, 3 = both
  * - Final Reviewer in `finalising`: 1 = Reviewer A, 2 = Reviewer B, 3 = both
  */

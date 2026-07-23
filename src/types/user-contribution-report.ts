@@ -1,5 +1,5 @@
-/** Per-task row from the ITV2 user contributions report endpoint. */
-export interface Itv2ContributionTask {
+/** Per-task row from the ITV3 user contributions report endpoint. */
+export interface Itv3ContributionTask {
   task_id: string
   name: string
   batch_name: string
@@ -24,7 +24,7 @@ export interface Itv2ContributionTask {
 }
 
 /** Shared rejection / pass-rate fields on contribution summaries (API renamed in 2026-06). */
-export interface Itv2ContributionRejectionMetrics {
+export interface Itv3ContributionRejectionMetrics {
   /** @deprecated Use `rejected_count` */
   rejection_count?: number
   rejected_count?: number
@@ -37,7 +37,7 @@ export interface Itv2ContributionRejectionMetrics {
 }
 
 /** Rejections initiated by the user (reviewer / final reviewer). */
-export interface Itv2RejectionsMadeMetrics {
+export interface Itv3RejectionsMadeMetrics {
   /** @deprecated Use `rejections_made_count` */
   rejections_made?: number
   rejections_made_count?: number
@@ -45,7 +45,7 @@ export interface Itv2RejectionsMadeMetrics {
   rejections_made_percent?: number
 }
 
-export interface Itv2AnnotatorContributionSummary extends Itv2ContributionRejectionMetrics {
+export interface Itv3AnnotatorContributionSummary extends Itv3ContributionRejectionMetrics {
   total_count: number
   tasks_annotated: number
   tasks_reviewed: number
@@ -55,8 +55,8 @@ export interface Itv2AnnotatorContributionSummary extends Itv2ContributionReject
   char_percent_diff: number
 }
 
-export interface Itv2ReviewerContributionSummary
-  extends Itv2ContributionRejectionMetrics, Itv2RejectionsMadeMetrics {
+export interface Itv3ReviewerContributionSummary
+  extends Itv3ContributionRejectionMetrics, Itv3RejectionsMadeMetrics {
   total_count?: number
   tasks_reviewed?: number
   /** Tasks reviewed in Reviewer A (order 1) slot. */
@@ -75,8 +75,8 @@ export interface Itv2ReviewerContributionSummary
   modified_option_sum?: number
 }
 
-export interface Itv2FinalReviewerContributionSummary
-  extends Itv2ContributionRejectionMetrics, Itv2RejectionsMadeMetrics {
+export interface Itv3FinalReviewerContributionSummary
+  extends Itv3ContributionRejectionMetrics, Itv3RejectionsMadeMetrics {
   total_count: number
   tasks_finalised: number
   final_char_count: number
@@ -90,13 +90,13 @@ export interface Itv2FinalReviewerContributionSummary
   modified_option_sum: number
 }
 
-export interface Itv2ContributionSummary {
-  annotator: Itv2AnnotatorContributionSummary | null
-  reviewer: Itv2ReviewerContributionSummary | null
-  final_reviewer: Itv2FinalReviewerContributionSummary | null
+export interface Itv3ContributionSummary {
+  annotator: Itv3AnnotatorContributionSummary | null
+  reviewer: Itv3ReviewerContributionSummary | null
+  final_reviewer: Itv3FinalReviewerContributionSummary | null
 }
 
 export interface UserContributionReportResponse {
-  tasks: Itv2ContributionTask[]
-  contribution_summary: Itv2ContributionSummary
+  tasks: Itv3ContributionTask[]
+  contribution_summary: Itv3ContributionSummary
 }

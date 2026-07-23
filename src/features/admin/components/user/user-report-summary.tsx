@@ -11,19 +11,19 @@ import {
   getSummaryRejectionsMadeCount,
   getSummaryRejectionsMadePercent,
   getSummaryUnrejectedTasksPercent,
-  type Itv2ReportRoleSummary,
+  type Itv3ReportRoleSummary,
 } from '@/lib/user-contribution-report'
 import {
   UserRole,
   normalizeUserRole,
-  type Itv2AnnotatorContributionSummary,
-  type Itv2FinalReviewerContributionSummary,
-  type Itv2ReviewerContributionSummary,
+  type Itv3AnnotatorContributionSummary,
+  type Itv3FinalReviewerContributionSummary,
+  type Itv3ReviewerContributionSummary,
 } from '@/types'
 
 interface UserReportSummaryProps {
   role: UserRole | string | undefined
-  summary: Itv2ReportRoleSummary | null
+  summary: Itv3ReportRoleSummary | null
   isLoading: boolean
 }
 
@@ -44,20 +44,20 @@ const STAT_CARD_BG = {
 } as const
 
 function isAnnotatorSummary(
-  summary: Itv2ReportRoleSummary
-): summary is Itv2AnnotatorContributionSummary {
+  summary: Itv3ReportRoleSummary
+): summary is Itv3AnnotatorContributionSummary {
   return 'tasks_annotated' in summary
 }
 
 function isReviewerSummary(
-  summary: Itv2ReportRoleSummary
-): summary is Itv2ReviewerContributionSummary {
+  summary: Itv3ReportRoleSummary
+): summary is Itv3ReviewerContributionSummary {
   return 'tasks_reviewed' in summary || 'review_char_count' in summary
 }
 
 function isFinalReviewerSummary(
-  summary: Itv2ReportRoleSummary
-): summary is Itv2FinalReviewerContributionSummary {
+  summary: Itv3ReportRoleSummary
+): summary is Itv3FinalReviewerContributionSummary {
   return 'tasks_finalised' in summary
 }
 

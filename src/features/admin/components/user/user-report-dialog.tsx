@@ -27,7 +27,7 @@ import { UserReportSummary } from './user-report-summary'
 import {
   UserRole,
   normalizeUserRole,
-  type Itv2ContributionTask,
+  type Itv3ContributionTask,
   type User,
 } from '@/types'
 
@@ -166,7 +166,7 @@ export function UserReportDialog({ open, onOpenChange, user }: UserReportDialogP
 }
 
 interface ContributionsTableProps {
-  tasks: Itv2ContributionTask[]
+  tasks: Itv3ContributionTask[]
   role: UserRole | undefined
 }
 
@@ -370,7 +370,7 @@ function RejectionCell({ count }: { count: number }) {
 }
 
 interface ContributionRowProps {
-  task: Itv2ContributionTask
+  task: Itv3ContributionTask
   role: UserRole
 }
 
@@ -466,7 +466,7 @@ function ReviewerContributionRow({ task, role }: ContributionRowProps) {
   )
 }
 
-function FinalReviewerContributionRow({ task }: { task: Itv2ContributionTask }) {
+function FinalReviewerContributionRow({ task }: { task: Itv3ContributionTask }) {
   return (
     <tr className="border-t transition-colors hover:bg-muted/30">
       <td className="max-w-[220px] truncate px-4 py-2.5" title={task.name}>

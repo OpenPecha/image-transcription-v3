@@ -1,8 +1,8 @@
 import type { AssignedTaskState } from '@/types'
 import {
   UserRole,
-  ITV2_REVIEWER_APPROVABLE_STATES,
-  ITV2_FINAL_REVIEWER_APPROVABLE_STATES,
+  ITV3_REVIEWER_APPROVABLE_STATES,
+  ITV3_FINAL_REVIEWER_APPROVABLE_STATES,
   isEditableTaskState,
   normalizeUserRole,
 } from '@/types'
@@ -103,10 +103,10 @@ export function isApprovableTaskState(
   role: UserRole | string | undefined
 ): boolean {
   if (isFinalReviewerRole(role)) {
-    return (ITV2_FINAL_REVIEWER_APPROVABLE_STATES as readonly string[]).includes(state)
+    return (ITV3_FINAL_REVIEWER_APPROVABLE_STATES as readonly string[]).includes(state)
   }
   if (isReviewerRole(role)) {
-    return (ITV2_REVIEWER_APPROVABLE_STATES as readonly string[]).includes(state)
+    return (ITV3_REVIEWER_APPROVABLE_STATES as readonly string[]).includes(state)
   }
   return false
 }
