@@ -1,6 +1,7 @@
 import {
   isAnnotatorATaskState,
   isAnnotatorBTaskState,
+  isAnnotatorCTaskState,
   isReviewerATaskState,
   isReviewerBTaskState,
   isTaskAtOrPastFinalReview,
@@ -21,12 +22,14 @@ import { normalizeUserRole } from '@/types'
 export type RejectionHistoryTargetLabelKey =
   | 'rejectionHistory.target.annotatorA'
   | 'rejectionHistory.target.annotatorB'
+  | 'rejectionHistory.target.annotatorC'
   | 'rejectionHistory.target.reviewerA'
   | 'rejectionHistory.target.reviewerB'
 
 const TARGET_LABEL_KEY: Record<RejectionHistoryTarget, RejectionHistoryTargetLabelKey> = {
   annotator_a: 'rejectionHistory.target.annotatorA',
   annotator_b: 'rejectionHistory.target.annotatorB',
+  annotator_c: 'rejectionHistory.target.annotatorC',
   reviewer_a: 'rejectionHistory.target.reviewerA',
   reviewer_b: 'rejectionHistory.target.reviewerB',
 }
@@ -40,6 +43,7 @@ export function getRejectionHistoryTargetLabelKey(
 const TARGET_SORT_ORDER: RejectionHistoryTarget[] = [
   'annotator_a',
   'annotator_b',
+  'annotator_c',
   'reviewer_a',
   'reviewer_b',
 ]
@@ -113,10 +117,10 @@ function mergeTimeline(entries: RejectionHistoryEntry[]): RejectionHistoryEntry[
 
 function slotEntries(
   task: TaskRejectionComments,
-  slot: 'A' | 'B',
+  slot: 'A' | 'B' | 'C',
   target: RejectionHistoryTarget
 ): RejectionHistoryEntry[] {
-  const records = slot === 'A' ? task.comment_A : task.comment_B
+  const records = slot === 'A' ? task.comment_A : slot === 'B' ? task.comment_B : task.comment_C
   return recordsToEntries(records, target)
 }
 
@@ -131,6 +135,10 @@ function getAnnotatorVisibleEntries(
 
   if (isAnnotatorBTaskState(task.state)) {
     return slotEntries(task, 'B', 'annotator_b')
+  }
+
+  if (isAnnotatorCTaskState(task.state)) {
+    return slotEntries(task, 'C', 'annotator_c')
   }
 
   return []
@@ -152,6 +160,7 @@ function getReviewerVisibleEntries(task: AssignedTask): RejectionHistoryEntry[] 
   return mergeTimeline([
     ...slotEntries(task, 'A', 'annotator_a'),
     ...slotEntries(task, 'B', 'annotator_b'),
+    ...slotEntries(task, 'C', 'annotator_c'),
   ])
 }
 
@@ -204,6 +213,7 @@ export function shouldShowRejectionTargetLabel(
   if (isAnnotatorRole(normalized)) {
     if (isAnnotatorATaskState(task.state) && target === 'annotator_a') return false
     if (isAnnotatorBTaskState(task.state) && target === 'annotator_b') return false
+    if (isAnnotatorCTaskState(task.state) && target === 'annotator_c') return false
     return true
   }
 

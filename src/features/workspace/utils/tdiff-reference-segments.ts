@@ -44,10 +44,9 @@ export function buildTDiffReferenceSegments(
     }
 
     const slotText = seg.options[optionIndex] ?? ''
-    const otherIndex = optionIndex === 0 ? 1 : 0
-    const otherText = seg.options[otherIndex] ?? ''
+    const isDifferent = seg.options.some((opt, idx) => idx !== optionIndex && opt !== slotText)
 
-    if (slotText === otherText) {
+    if (!isDifferent) {
       pushSegment(segments, 'default', slotText)
     } else {
       pushSegment(segments, 'highlight', slotText)

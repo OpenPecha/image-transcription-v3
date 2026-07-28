@@ -37,6 +37,7 @@ export {
   isEditableTaskState,
   isAnnotatorATaskState,
   isAnnotatorBTaskState,
+  isAnnotatorCTaskState,
   isReviewerATaskState,
   isReviewerBTaskState,
   isTaskAtOrPastFinalReview,

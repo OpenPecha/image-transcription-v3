@@ -9,6 +9,7 @@ type TaskParticipantInfo = Pick<
   | 'trashed_by'
   | 'annotator_a_username'
   | 'annotator_b_username'
+  | 'annotator_c_username'
   | 'reviewer_a_username'
   | 'reviewer_b_username'
   | 'final_reviewer_username'
@@ -25,6 +26,7 @@ interface ParticipantSlot {
 interface ParticipantRows {
   row1: ParticipantSlot[]
   row2: ParticipantSlot[]
+  row3: ParticipantSlot[]
 }
 
 function hasParticipantName(value: string | null | undefined): value is string {
@@ -36,6 +38,7 @@ function buildParticipantRows(
   labels: {
     annotator1: string
     annotator2: string
+    annotator3: string
     reviewer1: string
     reviewer2: string
     finalReviewer: string
@@ -43,6 +46,7 @@ function buildParticipantRows(
 ): ParticipantRows | null {
   const row1: ParticipantSlot[] = []
   const row2: ParticipantSlot[] = []
+  const row3: ParticipantSlot[] = []
 
   const slotRejection = (role: BatchTaskParticipantRole) =>
     getParticipantRejectionCount(task, role)
@@ -89,8 +93,17 @@ function buildParticipantRows(
     })
   }
 
-  if (row1.length === 0 && row2.length === 0) return null
-  return { row1, row2 }
+  if (hasParticipantName(task.annotator_c_username)) {
+    row3.push({
+      label: labels.annotator3,
+      value: task.annotator_c_username,
+      role: 'annotator_c',
+      rejectionCount: slotRejection('annotator_c'),
+    })
+  }
+
+  if (row1.length === 0 && row2.length === 0 && row3.length === 0) return null
+  return { row1, row2, row3 }
 }
 
 interface ParticipantCellProps extends ParticipantSlot {
@@ -229,6 +242,7 @@ export function TaskParticipantsBar({
   const rows = buildParticipantRows(task, {
     annotator1: t('batches.participants.annotator1'),
     annotator2: t('batches.participants.annotator2'),
+    annotator3: t('batches.participants.annotator3'),
     reviewer1: t('batches.participants.reviewer1'),
     reviewer2: t('batches.participants.reviewer2'),
     finalReviewer: t('batches.participants.finalReviewer'),
@@ -252,6 +266,13 @@ export function TaskParticipantsBar({
       />
       <ParticipantRow
         slots={rows.row2}
+        selectedRole={selectedRole}
+        isInteractive={isInteractive}
+        getTranscriptForRole={getTranscriptForRole}
+        onSelectRole={onSelectRole}
+      />
+      <ParticipantRow
+        slots={rows.row3}
         selectedRole={selectedRole}
         isInteractive={isInteractive}
         getTranscriptForRole={getTranscriptForRole}

@@ -19,7 +19,9 @@
     "reject": "Reject",
     "rejectAnnotatorA": "Reject Annotator A",
     "rejectAnnotatorB": "Reject Annotator B",
+    "rejectAnnotatorC": "Reject Annotator C",
     "rejectBoth": "Reject Both",
+    "rejectAll": "Reject All Annotators",
     "rejectReviewerA": "Reject Reviewer A",
     "rejectReviewerB": "Reject Reviewer B",
     "rejectBothReviewers": "Reject Both Reviewers"
@@ -131,6 +133,7 @@
     "target": {
       "annotatorA": "Annotator A",
       "annotatorB": "Annotator B",
+      "annotatorC": "Annotator C",
       "reviewerA": "Reviewer A",
       "reviewerB": "Reviewer B"
     },
@@ -156,6 +159,7 @@
     "previewPlaceholder": "Resolved preview will appear here...",
     "annotator1": "Annotator A",
     "annotator2": "Annotator B",
+    "annotator3": "Annotator C",
     "reviewer1": "Reviewer A",
     "reviewer2": "Reviewer B",
     "previousReview": "Previous review",
@@ -173,7 +177,7 @@
     "whitespaceNewline": "line break"
   },
   "reviewer": {
-    "pendingAlignment": "Waiting for annotator comparison. The alignment diff will appear here once both annotations are ready.",
+    "pendingAlignment": "Waiting for annotator comparison. The alignment diff will appear here once all annotations are ready.",
     "noDiffsToResolve": "No differences between annotators. Select text and press E to flag a shared mistake, then approve.",
     "emptyTranscript": "No transcript available yet."
   },

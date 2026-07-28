@@ -23,6 +23,7 @@ const getStateColor = (state: string): string => {
   switch (state) {
     case 'annotating':
     case 'annotating_b':
+    case 'annotating_c':
       return 'text-primary fill-primary'
     case 'reviewing':
     case 'reviewing_b':
@@ -92,7 +93,7 @@ export function WorkspaceSidebar({
             </div>
             <div className="flex flex-col leading-tight">
               <span className="font-bold text-sidebar-foreground font-inter">Image</span>
-              <span className="text-xs text-sidebar-foreground/70 font-inter">Transcription V2</span>
+              <span className="text-xs text-sidebar-foreground/70 font-inter">Transcription V3</span>
             </div>
           </div>
       </div>

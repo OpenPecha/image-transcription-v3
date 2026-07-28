@@ -10,6 +10,7 @@ interface AnnotatorReadonlyPanelProps {
   otherValue?: string
   /** True for slot 1 (A); false for slot 2 (B). */
   isPrimarySlot?: boolean
+  optionIndex?: number
   /** Comparison transcript with `<t-diff>` tags — preferred for highlight boundaries. */
   comparisonTranscript?: string
   highlightMode?: ReadonlyPanelHighlightMode
@@ -22,6 +23,7 @@ export function AnnotatorReadonlyPanel({
   value,
   otherValue = '',
   isPrimarySlot = true,
+  optionIndex,
   comparisonTranscript,
   highlightMode = 'annotator-slot',
   placeholder,
@@ -35,13 +37,15 @@ export function AnnotatorReadonlyPanel({
       return buildActReviewerReferenceSegments(comparisonTranscript, value)
     }
 
+    const resolvedOptionIndex = optionIndex !== undefined ? optionIndex : (isPrimarySlot ? 0 : 1)
+
     return buildAnnotatorSlotReferenceSegments({
       value,
       otherValue,
-      isPrimarySlot,
+      optionIndex: resolvedOptionIndex,
       comparisonTranscript,
     })
-  }, [value, otherValue, isPrimarySlot, comparisonTranscript, highlightMode])
+  }, [value, otherValue, isPrimarySlot, optionIndex, comparisonTranscript, highlightMode])
   const sharedStyle = { fontFamily, fontSize: `${fontSize}px`, lineHeight: 1.8 }
 
   if (!value.trim()) {

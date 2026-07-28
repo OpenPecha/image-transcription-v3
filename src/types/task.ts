@@ -97,6 +97,7 @@ export type AssignedTaskState =
   | 'annotating'
   | 'half_annotated'
   | 'annotating_b'
+  | 'annotating_c'
   | 'annotated'
   | 'reviewing'
   | 'half_reviewed'
@@ -109,6 +110,7 @@ export type AssignedTaskState =
 export const ITV3_EDITABLE_TASK_STATES = [
   'annotating',
   'annotating_b',
+  'annotating_c',
   'reviewing',
   'reviewing_b',
 ] as const satisfies readonly AssignedTaskState[]
@@ -138,13 +140,18 @@ export function isAnnotatorBTaskState(state: AssignedTaskState): boolean {
   return state === 'annotating_b'
 }
 
+/** Annotator C slot — receives baseline OCR via initial_transcript, cannot trash. */
+export function isAnnotatorCTaskState(state: AssignedTaskState): boolean {
+  return state === 'annotating_c'
+}
+
 export function canAnnotatorTrashTask(state: AssignedTaskState): boolean {
   return isAnnotatorATaskState(state)
 }
 
 /** Baseline text shown in the annotator editor (Annotator B is double-blind from Annotator A). */
 export function getAnnotatorBaselineTranscript(task: AssignedTask): string {
-  if (isAnnotatorBTaskState(task.state)) {
+  if (isAnnotatorBTaskState(task.state) || isAnnotatorCTaskState(task.state)) {
     return (task.initial_transcript?.trim() || task.task_transcript) ?? ''
   }
   return task.task_transcript ?? ''
@@ -159,6 +166,7 @@ export interface RejectionCommentRecord {
 export type RejectionHistoryTarget =
   | 'annotator_a'
   | 'annotator_b'
+  | 'annotator_c'
   | 'reviewer_a'
   | 'reviewer_b'
 
@@ -171,6 +179,7 @@ export interface RejectionHistoryEntry {
 export interface TaskRejectionComments {
   comment_A?: RejectionCommentRecord[]
   comment_B?: RejectionCommentRecord[]
+  comment_C?: RejectionCommentRecord[]
 }
 
 const FINAL_REVIEW_PIPELINE_STATES = [
@@ -202,6 +211,8 @@ export interface AssignedTask {
   task_transcript_1?: string
   /** Slot 2 reference transcript — Annotator B (reviewers) or Reviewer B (final reviewer). */
   task_transcript_2?: string
+  /** Slot 3 reference transcript — Annotator C. */
+  task_transcript_3?: string
   /** Reviewer's prior submission when reassigned after final-reviewer rejection. */
   reviewer_transcript?: string
   initial_transcript?: string
@@ -213,10 +224,12 @@ export interface AssignedTask {
   rejection_count?: number
   annotation_a_rejection_count?: number
   annotation_b_rejection_count?: number
+  annotation_c_rejection_count?: number
   review_a_rejection_count?: number
   review_b_rejection_count?: number
   comment_A?: RejectionCommentRecord[]
   comment_B?: RejectionCommentRecord[]
+  comment_C?: RejectionCommentRecord[]
 }
 
 // Task submission request
