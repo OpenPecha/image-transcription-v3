@@ -2,7 +2,6 @@ import type {
   Itv3AnnotatorContributionSummary,
   Itv3ContributionRejectionMetrics,
   Itv3ContributionSummary,
-  Itv3FinalReviewerContributionSummary,
   Itv3RejectionsMadeMetrics,
   Itv3ReviewerContributionSummary,
   UserContributionReportResponse,
@@ -12,7 +11,6 @@ import { UserRole, normalizeUserRole } from '@/types/user'
 export type Itv3ReportRoleSummary =
   | Itv3AnnotatorContributionSummary
   | Itv3ReviewerContributionSummary
-  | Itv3FinalReviewerContributionSummary
 
 export function getContributionSummaryForRole(
   summary: Itv3ContributionSummary | undefined,
@@ -23,7 +21,6 @@ export function getContributionSummaryForRole(
   const normalized = normalizeUserRole(role)
   if (normalized === UserRole.Annotator) return summary.annotator
   if (normalized === UserRole.Reviewer) return summary.reviewer
-  if (normalized === UserRole.FinalReviewer) return summary.final_reviewer
   return null
 }
 
@@ -75,7 +72,6 @@ export function emptyContributionReport(): UserContributionReportResponse {
     contribution_summary: {
       annotator: null,
       reviewer: null,
-      final_reviewer: null,
     },
   }
 }
@@ -106,18 +102,15 @@ export function formatReportCountSum(
 
 export function getContributionSlotLabelKey(
   role: UserRole | string | undefined,
-  order: 1 | 2 | null
-): 'annotatorA' | 'annotatorB' | 'reviewerA' | 'reviewerB' {
-  if (order == null) {
-    return 'reviewerA'
+  order: 1 | 2 | 3 | null
+): 'annotatorA' | 'annotatorB' | 'annotatorC' | 'reviewer' {
+  const normalized = normalizeUserRole(role)
+
+  if (normalized === UserRole.Reviewer || order == null) {
+    return 'reviewer'
   }
 
-  const normalized = normalizeUserRole(role)
-  if (normalized === UserRole.Reviewer) {
-    return order === 1 ? 'reviewerA' : 'reviewerB'
-  }
-  if (normalized === UserRole.FinalReviewer) {
-    return order === 1 ? 'reviewerA' : 'reviewerB'
-  }
-  return order === 1 ? 'annotatorA' : 'annotatorB'
+  if (order === 1) return 'annotatorA'
+  if (order === 2) return 'annotatorB'
+  return 'annotatorC'
 }

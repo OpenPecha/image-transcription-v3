@@ -14,11 +14,6 @@ export function isReviewerRole(role: UserRole | string | undefined): boolean {
   return normalizeUserRole(role) === UserRole.Reviewer
 }
 
-/** Kept until Part 3 removes Final Reviewer from admin surfaces. */
-export function isFinalReviewerRole(role: UserRole | string | undefined): boolean {
-  return normalizeUserRole(role) === UserRole.FinalReviewer
-}
-
 export type ReferenceTabsMode = 'none' | 'annotators'
 
 export type WorkspaceRoleCaps = {

@@ -34,7 +34,7 @@ const navItems: NavItem[] = [
     labelKey: 'nav.dashboard',
     href: '/dashboard',
     icon: LayoutDashboard,
-    roles: [UserRole.Admin, UserRole.Annotator, UserRole.Reviewer, UserRole.FinalReviewer],
+    roles: [UserRole.Admin, UserRole.Annotator, UserRole.Reviewer],
   },
   {
     labelKey: 'nav.users',

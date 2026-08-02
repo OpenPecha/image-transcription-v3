@@ -53,8 +53,6 @@ export interface Task {
   assignedToName?: string
   reviewerId?: string
   reviewerName?: string
-  finalReviewerId?: string
-  finalReviewerName?: string
   history: TaskHistoryEntry[]
   createdAt: Date
   updatedAt: Date

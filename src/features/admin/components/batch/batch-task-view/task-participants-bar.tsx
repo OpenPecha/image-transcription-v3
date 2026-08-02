@@ -11,19 +11,17 @@ type TaskParticipantInfo = Pick<
   | 'annotator_b_username'
   | 'annotator_c_username'
   | 'reviewer_a_username'
-  | 'reviewer_b_username'
-  | 'final_reviewer_username'
 > &
   TaskRejectionCounts
 
-interface ParticipantSlot {
+type ParticipantSlot = {
   label: string
   value: string
   role: BatchTaskParticipantRole
   rejectionCount?: number
 }
 
-interface ParticipantRows {
+type ParticipantRows = {
   row1: ParticipantSlot[]
   row2: ParticipantSlot[]
   row3: ParticipantSlot[]
@@ -35,21 +33,14 @@ function hasParticipantName(value: string | null | undefined): value is string {
 
 function buildParticipantRows(
   task: TaskParticipantInfo,
-  labels: {
-    annotator1: string
-    annotator2: string
-    annotator3: string
-    reviewer1: string
-    reviewer2: string
-    finalReviewer: string
-  }
+  labels: { annotator1: string; annotator2: string; annotator3: string; reviewer: string }
 ): ParticipantRows | null {
+  const slotRejection = (role: BatchTaskParticipantRole) =>
+    getParticipantRejectionCount(task, role)
+
   const row1: ParticipantSlot[] = []
   const row2: ParticipantSlot[] = []
   const row3: ParticipantSlot[] = []
-
-  const slotRejection = (role: BatchTaskParticipantRole) =>
-    getParticipantRejectionCount(task, role)
 
   if (hasParticipantName(task.annotator_a_username)) {
     row1.push({
@@ -61,21 +52,12 @@ function buildParticipantRows(
   }
   if (hasParticipantName(task.reviewer_a_username)) {
     row1.push({
-      label: labels.reviewer1,
+      label: labels.reviewer,
       value: task.reviewer_a_username,
-      role: 'reviewer_a',
-      rejectionCount: slotRejection('reviewer_a'),
+      role: 'reviewer',
+      rejectionCount: slotRejection('reviewer'),
     })
   }
-  if (hasParticipantName(task.final_reviewer_username)) {
-    row1.push({
-      label: labels.finalReviewer,
-      value: task.final_reviewer_username,
-      role: 'final_reviewer',
-      rejectionCount: slotRejection('final_reviewer'),
-    })
-  }
-
   if (hasParticipantName(task.annotator_b_username)) {
     row2.push({
       label: labels.annotator2,
@@ -84,15 +66,6 @@ function buildParticipantRows(
       rejectionCount: slotRejection('annotator_b'),
     })
   }
-  if (hasParticipantName(task.reviewer_b_username)) {
-    row2.push({
-      label: labels.reviewer2,
-      value: task.reviewer_b_username,
-      role: 'reviewer_b',
-      rejectionCount: slotRejection('reviewer_b'),
-    })
-  }
-
   if (hasParticipantName(task.annotator_c_username)) {
     row3.push({
       label: labels.annotator3,
@@ -106,7 +79,7 @@ function buildParticipantRows(
   return { row1, row2, row3 }
 }
 
-interface ParticipantCellProps extends ParticipantSlot {
+type ParticipantCellProps = ParticipantSlot & {
   isSelected?: boolean
   isInteractive?: boolean
   hasTranscript?: boolean
@@ -164,7 +137,7 @@ function ParticipantCell({
   )
 }
 
-interface ParticipantRowProps {
+type ParticipantRowProps = {
   slots: ParticipantSlot[]
   selectedRole?: BatchTaskParticipantRole | null
   isInteractive?: boolean
@@ -210,7 +183,7 @@ function ParticipantRow({
   )
 }
 
-interface TaskParticipantsBarProps {
+type TaskParticipantsBarProps = {
   task: TaskParticipantInfo
   selectedRole?: BatchTaskParticipantRole | null
   onSelectRole?: (role: BatchTaskParticipantRole) => void
@@ -243,9 +216,7 @@ export function TaskParticipantsBar({
     annotator1: t('batches.participants.annotator1'),
     annotator2: t('batches.participants.annotator2'),
     annotator3: t('batches.participants.annotator3'),
-    reviewer1: t('batches.participants.reviewer1'),
-    reviewer2: t('batches.participants.reviewer2'),
-    finalReviewer: t('batches.participants.finalReviewer'),
+    reviewer: t('batches.participants.reviewer'),
   })
 
   if (!rows) return null

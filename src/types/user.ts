@@ -1,9 +1,8 @@
-// User roles in the system
+// User roles in the system (ITv3: Admin + Annotator + Reviewer only)
 export enum UserRole {
   Admin = 'admin',
   Annotator = 'annotator',
   Reviewer = 'reviewer',
-  FinalReviewer = 'final reviewer',
 }
 
 // User interface
@@ -59,11 +58,10 @@ export const ROLE_CONFIG: Record<UserRole, { label: string; description: string 
   [UserRole.Admin]: { label: 'Admin', description: 'System administrator with full access' },
   [UserRole.Annotator]: { label: 'Annotator', description: 'Annotates and transcribes content' },
   [UserRole.Reviewer]: { label: 'Reviewer', description: 'Reviews and validates corrections' },
-  [UserRole.FinalReviewer]: { label: 'Final Reviewer', description: 'Performs final quality check' },
 }
 
 // User contribution from report endpoint
-/** @deprecated Legacy flat contribution row — use ITV2 {@link UserContributionReportResponse} instead. */
+/** @deprecated Legacy flat contribution row — use {@link UserContributionReportResponse} instead. */
 export interface UserContribution {
   task_id: string
   name: string
@@ -71,7 +69,7 @@ export interface UserContribution {
   batch_name: string
   rejection_count: number
   updated_time: string
-  role: 'annotator' | 'reviewer' | 'final reviewer'
+  role: 'annotator' | 'reviewer'
   line_count: number | null
 }
 
@@ -95,8 +93,9 @@ export function normalizeUserRole(
     case 'reviewer':
     case 'reveiwer':
       return UserRole.Reviewer
+    // Legacy ITv2 role — no longer assignable in ITv3
     case 'final reviewer':
-      return UserRole.FinalReviewer
+      return undefined
     default:
       if (Object.values(UserRole).includes(role as UserRole)) {
         return role as UserRole

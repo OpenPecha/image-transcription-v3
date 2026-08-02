@@ -22,9 +22,7 @@ const SLOT_REJECTION_FIELD: Record<
   annotator_a: 'annotation_a_rejection_count',
   annotator_b: 'annotation_b_rejection_count',
   annotator_c: 'annotation_c_rejection_count',
-  reviewer_a: 'review_a_rejection_count',
-  reviewer_b: 'review_b_rejection_count',
-  final_reviewer: null,
+  reviewer: 'review_a_rejection_count',
 }
 
 /** Per-participant rejection count for admin batch views (undefined when not applicable). */
