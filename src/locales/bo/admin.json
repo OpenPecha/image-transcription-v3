@@ -229,11 +229,10 @@
     "states": {
       "all": "ཚང་མ།",
       "pending": "སྒུག་བཞིན།",
-      "half_annotated": "མཆན་བཀོད་ཕྱེད་ཀ",
+      "annotated_a": "མཆན་བཀོད་ ཀ",
+      "annotated_b": "མཆན་བཀོད་ ཁ",
       "annotated": "མཆན་བཀོད།",
-      "half_reviewed": "བསྐྱར་ཞིབ་ཕྱེད་ཀ",
       "reviewed": "བསྐྱར་ཞིབ་བྱས།",
-      "finalised": "མཇུག་བསྒྲིལ།",
       "trashed": "བསུབས།"
     },
     "upload": {

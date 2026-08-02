@@ -18,7 +18,7 @@ import { BatchTaskSearch } from './batch-task-search'
 export function BatchList() {
   const { t } = useTranslation('admin')
   const { data: batches = [], isLoading } = useGetBatches()
-  const { data: applicationReports = [], isLoading: isApplicationReportLoading } =
+  const { data: applicationReport, isLoading: isApplicationReportLoading } =
     useGetApplicationBatchReport(APPLICATION_NAME)
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false)
   
@@ -40,20 +40,10 @@ export function BatchList() {
         </CardHeader>
         <CardContent className="pt-0">
           <div className="mb-6 space-y-4">
-            {isApplicationReportLoading ? (
-              <>
-                <ApplicationBatchSummary report={undefined} isLoading={true} />
-                <ApplicationBatchSummary report={undefined} isLoading={true} />
-              </>
-            ) : (
-              applicationReports.map((report) => (
-                <ApplicationBatchSummary
-                  key={report.id}
-                  report={report}
-                  isLoading={false}
-                />
-              ))
-            )}
+            <ApplicationBatchSummary
+              report={applicationReport}
+              isLoading={isApplicationReportLoading}
+            />
           </div>
 
           <div className="mb-4 border-b" />

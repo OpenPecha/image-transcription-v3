@@ -64,10 +64,10 @@ export function buildAllSegments(report: BatchReport): ProgressSegmentData[] {
 }
 
 /**
- * Calculate finalized percentage
+ * Calculate completion percentage — `reviewed` is the terminal ITv3 state
  */
 export function getFinalizedPercentage(report: BatchReport): number {
   const activeTotal = report.total_tasks - report.trashed
-  return calculatePercentage(report.finalised, activeTotal)
+  return calculatePercentage(report.reviewed, activeTotal)
 }
 

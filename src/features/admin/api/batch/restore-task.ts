@@ -41,18 +41,16 @@ export function applyRestoreTaskCache(
     }
   })
 
-  queryClient.setQueryData<ApplicationBatchReport[]>(
+  queryClient.setQueryData<ApplicationBatchReport>(
     batchKeys.applicationReport(APPLICATION_NAME),
-    (old) =>
-      old?.map((report) =>
-        report.id === batchId
-          ? {
-              ...report,
-              trashed: Math.max(0, report.trashed - 1),
-              pending: report.pending + 1,
-            }
-          : report
-      ) ?? old
+    (old) => {
+      if (!old) return old
+      return {
+        ...old,
+        trashed: Math.max(0, old.trashed - 1),
+        pending: old.pending + 1,
+      }
+    }
   )
 }
 
