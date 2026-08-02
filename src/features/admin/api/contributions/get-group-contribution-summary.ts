@@ -17,7 +17,6 @@ const emptyGroupContributionSummary = (
   group_name: '',
   annotator: [],
   reviewer: [],
-  final_reviewer: [],
 })
 
 export async function getGroupContributionSummary(
@@ -45,7 +44,6 @@ export async function getGroupContributionSummary(
     group_name: response.group_name ?? '',
     annotator: response.annotator ?? [],
     reviewer: response.reviewer ?? [],
-    final_reviewer: response.final_reviewer ?? [],
   }
 }
 

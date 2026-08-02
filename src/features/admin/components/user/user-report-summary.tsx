@@ -17,7 +17,6 @@ import {
   UserRole,
   normalizeUserRole,
   type Itv3AnnotatorContributionSummary,
-  type Itv3FinalReviewerContributionSummary,
   type Itv3ReviewerContributionSummary,
 } from '@/types'
 
@@ -53,12 +52,6 @@ function isReviewerSummary(
   summary: Itv3ReportRoleSummary
 ): summary is Itv3ReviewerContributionSummary {
   return 'tasks_reviewed' in summary || 'review_char_count' in summary
-}
-
-function isFinalReviewerSummary(
-  summary: Itv3ReportRoleSummary
-): summary is Itv3FinalReviewerContributionSummary {
-  return 'tasks_finalised' in summary
 }
 
 export function UserReportSummary({ role, summary, isLoading }: UserReportSummaryProps) {
@@ -184,70 +177,6 @@ export function UserReportSummary({ role, summary, isLoading }: UserReportSummar
           value: formatReportPercent(getSummaryRejectionsMadePercent(summary)),
           label: t('users.report.summary.rejectionsMadePercent'),
           bg: STAT_CARD_BG.red,
-        },
-        {
-          value: formatReportCountSum(
-            summary.own_version_count,
-            summary.own_version_sum
-          ),
-          label: t('users.report.summary.ownVersion'),
-          bg: STAT_CARD_BG.sky,
-        },
-        {
-          value: formatReportCountSum(
-            summary.selected_option_count,
-            summary.selected_option_sum
-          ),
-          label: t('users.report.summary.selectedOption'),
-          bg: STAT_CARD_BG.emerald,
-        },
-        {
-          value: formatReportCountSum(
-            summary.modified_option_count,
-            summary.modified_option_sum
-          ),
-          label: t('users.report.summary.modifiedOption'),
-          bg: STAT_CARD_BG.amber,
-        },
-      ]
-    }
-
-    if (normalizedRole === UserRole.FinalReviewer && isFinalReviewerSummary(summary)) {
-      return [
-        {
-          value: summary.tasks_finalised ?? summary.total_count ?? 0,
-          label: t('users.report.summary.tasksFinalised'),
-          bg: STAT_CARD_BG.emerald,
-        },
-        {
-          value: getSummaryRejectionsMadeCount(summary),
-          label: t('users.report.summary.rejectionsMade'),
-          bg: STAT_CARD_BG.red,
-        },
-        {
-          value: formatReportPercent(getSummaryRejectionsMadePercent(summary)),
-          label: t('users.report.summary.rejectionsMadePercent'),
-          bg: STAT_CARD_BG.red,
-        },
-        {
-          value: formatReportPercent(getSummaryUnrejectedTasksPercent(summary)),
-          label: t('users.report.summary.unrejectedPercent'),
-          bg: STAT_CARD_BG.violet,
-        },
-        {
-          value: formatReportNumber(summary.final_char_count),
-          label: t('users.report.summary.finalCharCount'),
-          bg: STAT_CARD_BG.blue,
-        },
-        {
-          value: formatReportSignedNumber(summary.total_char_difference),
-          label: t('users.report.summary.charDiffVsFinal'),
-          bg: STAT_CARD_BG.amber,
-        },
-        {
-          value: formatReportPercent(summary.char_percent_diff),
-          label: t('users.report.summary.charPercentDiff'),
-          bg: STAT_CARD_BG.orange,
         },
         {
           value: formatReportCountSum(

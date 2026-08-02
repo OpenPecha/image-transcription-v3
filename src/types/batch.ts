@@ -44,15 +44,13 @@ export interface BatchTask {
   annotator_a_username?: string | null
   annotator_b_username?: string | null
   annotator_c_username?: string | null
+  /** Single ITv3 reviewer username (API may still send as reviewer_a_username). */
   reviewer_a_username?: string | null
-  reviewer_b_username?: string | null
-  final_reviewer_username?: string | null
   trashed_by?: string | null
   annotation_a_rejection_count?: number
   annotation_b_rejection_count?: number
   annotation_c_rejection_count?: number
   review_a_rejection_count?: number
-  review_b_rejection_count?: number
 }
 
 // Task returned from application-wide task search
@@ -66,8 +64,6 @@ export interface BatchTaskSearchResult {
   annotator_b_username?: string | null
   annotator_c_username?: string | null
   reviewer_a_username?: string | null
-  reviewer_b_username?: string | null
-  final_reviewer_username?: string | null
   trashed_by?: string | null
   batch_id: string
   batch_name: string
@@ -76,39 +72,30 @@ export interface BatchTaskSearchResult {
   annotation_transcript_order_2: string | null
   annotation_transcript_order_3: string | null
   reviewed_transcript_order_1: string | null
-  reviewed_transcript_order_2: string | null
-  finalised_transcript: string | null
   annotation_a_rejection_count?: number
   annotation_b_rejection_count?: number
   annotation_c_rejection_count?: number
   review_a_rejection_count?: number
-  review_b_rejection_count?: number
 }
 
 export type BatchTaskParticipantRole =
   | 'annotator_a'
   | 'annotator_b'
   | 'annotator_c'
-  | 'reviewer_a'
-  | 'reviewer_b'
-  | 'final_reviewer'
+  | 'reviewer'
 
 export const BATCH_TASK_PARTICIPANT_ROLE_LABEL_KEYS = {
   annotator_a: 'annotator1',
   annotator_b: 'annotator2',
   annotator_c: 'annotator3',
-  reviewer_a: 'reviewer1',
-  reviewer_b: 'reviewer2',
-  final_reviewer: 'finalReviewer',
+  reviewer: 'reviewer',
 } as const satisfies Record<
   BatchTaskParticipantRole,
-  'annotator1' | 'annotator2' | 'annotator3' | 'reviewer1' | 'reviewer2' | 'finalReviewer'
+  'annotator1' | 'annotator2' | 'annotator3' | 'reviewer'
 >
 
 const PARTICIPANT_TRANSCRIPT_PRIORITY: BatchTaskParticipantRole[] = [
-  'final_reviewer',
-  'reviewer_b',
-  'reviewer_a',
+  'reviewer',
   'annotator_c',
   'annotator_b',
   'annotator_a',
@@ -123,9 +110,7 @@ export function getBatchTaskSearchParticipantTranscript(
     annotator_a: task.annotation_transcript_order_1,
     annotator_b: task.annotation_transcript_order_2,
     annotator_c: task.annotation_transcript_order_3,
-    reviewer_a: task.reviewed_transcript_order_1,
-    reviewer_b: task.reviewed_transcript_order_2,
-    final_reviewer: task.finalised_transcript,
+    reviewer: task.reviewed_transcript_order_1,
   }
 
   const value = transcriptByRole[role]?.trim()

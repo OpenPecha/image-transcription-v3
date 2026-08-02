@@ -46,14 +46,12 @@
   "roles": {
     "admin": "Admin",
     "annotator": "Annotator",
-    "reviewer": "Reviewer",
-    "finalReviewer": "Final Reviewer"
+    "reviewer": "Reviewer"
   },
   "roleDescriptions": {
     "admin": "System administrator with full access",
     "annotator": "Annotates and transcribes content",
-    "reviewer": "Reviews and validates corrections",
-    "finalReviewer": "Performs final quality check"
+    "reviewer": "Reviews and validates corrections"
   },
   "filters": {
     "all": "All",

@@ -5,7 +5,7 @@ export interface Itv3ContributionTask {
   batch_name: string
   updated_time: string
   role: string
-  order: 1 | 2 | null
+  order: 1 | 2 | 3 | null
   rejection_count: number
   final_char_count: number | null
   total_char_difference: number | null
@@ -36,7 +36,7 @@ export interface Itv3ContributionRejectionMetrics {
   unrejected_tasks_percent?: number
 }
 
-/** Rejections initiated by the user (reviewer / final reviewer). */
+/** Rejections initiated by the user (reviewer). */
 export interface Itv3RejectionsMadeMetrics {
   /** @deprecated Use `rejections_made_count` */
   rejections_made?: number
@@ -59,7 +59,7 @@ export interface Itv3ReviewerContributionSummary
   extends Itv3ContributionRejectionMetrics, Itv3RejectionsMadeMetrics {
   total_count?: number
   tasks_reviewed?: number
-  /** Tasks reviewed in Reviewer A (order 1) slot. */
+  /** Tasks reviewed in the reviewer slot. */
   tasks_reviewed_as_r1?: number
   tasks_final_reviewed?: number
   final_char_count?: number
@@ -75,25 +75,9 @@ export interface Itv3ReviewerContributionSummary
   modified_option_sum?: number
 }
 
-export interface Itv3FinalReviewerContributionSummary
-  extends Itv3ContributionRejectionMetrics, Itv3RejectionsMadeMetrics {
-  total_count: number
-  tasks_finalised: number
-  final_char_count: number
-  total_char_difference: number
-  char_percent_diff: number
-  own_version_count: number
-  own_version_sum: number
-  selected_option_count: number
-  selected_option_sum: number
-  modified_option_count: number
-  modified_option_sum: number
-}
-
 export interface Itv3ContributionSummary {
   annotator: Itv3AnnotatorContributionSummary | null
   reviewer: Itv3ReviewerContributionSummary | null
-  final_reviewer: Itv3FinalReviewerContributionSummary | null
 }
 
 export interface UserContributionReportResponse {

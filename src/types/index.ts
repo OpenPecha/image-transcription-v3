@@ -12,7 +12,6 @@ export type {
   Itv3AnnotatorContributionSummary,
   Itv3ContributionSummary,
   Itv3ContributionTask,
-  Itv3FinalReviewerContributionSummary,
   Itv3ReviewerContributionSummary,
   UserContributionReportResponse,
 } from './user-contribution-report'
@@ -20,7 +19,6 @@ export type {
 export type {
   AnnotatorContributionRow,
   ContributionSummaryQueryParams,
-  FinalReviewerContributionRow,
   GroupContributionSummaryResponse,
   ReviewerContributionRow,
 } from './contributions'

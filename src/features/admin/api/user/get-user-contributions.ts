@@ -26,7 +26,6 @@ const getUserContributions = async (
     contribution_summary: response.contribution_summary ?? {
       annotator: null,
       reviewer: null,
-      final_reviewer: null,
     },
   }
 }
