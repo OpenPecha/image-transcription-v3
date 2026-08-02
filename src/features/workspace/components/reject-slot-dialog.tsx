@@ -18,18 +18,15 @@ import {
   REJECT_TARGET_ANNOTATOR_B,
   REJECT_TARGET_ANNOTATOR_C,
   REJECT_TARGET_BOTH,
-  REJECT_TARGET_REVIEWER_A,
-  REJECT_TARGET_REVIEWER_B,
   REJECT_TARGET_ALL_ANNOTATORS,
 } from '../types/reject-target'
 
-export interface RejectConfirmParams {
+export type RejectConfirmParams = {
   reject_target: RejectTarget
   comment: string
 }
 
-interface RejectSlotDialogProps {
-  variant: 'annotator' | 'reviewer'
+type RejectSlotDialogProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   onCancel: () => void
@@ -39,17 +36,7 @@ interface RejectSlotDialogProps {
   hasAnnotatorC?: boolean
 }
 
-const VARIANT_CONFIG = {
-  annotator: {
-    copyKey: 'choose' as const,
-  },
-  reviewer: {
-    copyKey: 'chooseReviewers' as const,
-  },
-} as const
-
 export function RejectSlotDialog({
-  variant,
   open,
   onOpenChange,
   onCancel,
@@ -60,17 +47,9 @@ export function RejectSlotDialog({
 }: RejectSlotDialogProps) {
   const { t } = useTranslation('workspace')
   const { t: tCommon } = useTranslation('common')
-  const config = VARIANT_CONFIG[variant]
-  const copyPrefix = `dialogs.reject.${config.copyKey}`
+  const copyPrefix = 'dialogs.reject.choose'
 
   const options = useMemo(() => {
-    if (variant === 'reviewer') {
-      return [
-        { target: REJECT_TARGET_REVIEWER_A, labelKey: 'actions.rejectReviewerA' },
-        { target: REJECT_TARGET_REVIEWER_B, labelKey: 'actions.rejectReviewerB' },
-        { target: REJECT_TARGET_BOTH, labelKey: 'actions.rejectBothReviewers' },
-      ]
-    }
     if (hasAnnotatorC) {
       return [
         { target: REJECT_TARGET_ANNOTATOR_A, labelKey: 'actions.rejectAnnotatorA' },
@@ -84,7 +63,7 @@ export function RejectSlotDialog({
       { target: REJECT_TARGET_ANNOTATOR_B, labelKey: 'actions.rejectAnnotatorB' },
       { target: REJECT_TARGET_BOTH, labelKey: 'actions.rejectBoth' },
     ]
-  }, [variant, hasAnnotatorC])
+  }, [hasAnnotatorC])
 
   const [selectedTarget, setSelectedTarget] = useState<RejectTarget | null>(null)
   const [comment, setComment] = useState('')
@@ -138,7 +117,7 @@ export function RejectSlotDialog({
                 >
                   <input
                     type="radio"
-                    name={`reject-target-${variant}`}
+                    name="reject-target-annotator"
                     value={target}
                     checked={selectedTarget === target}
                     onChange={() => setSelectedTarget(target)}
@@ -152,11 +131,11 @@ export function RejectSlotDialog({
           </fieldset>
 
           <div className="space-y-2">
-            <Label htmlFor={`reject-comment-${variant}`}>
+            <Label htmlFor="reject-comment-annotator">
               {t(`${copyPrefix}.commentLabel`)}
             </Label>
             <Textarea
-              id={`reject-comment-${variant}`}
+              id="reject-comment-annotator"
               value={comment}
               onChange={(event) => setComment(event.target.value)}
               placeholder={t(`${copyPrefix}.commentPlaceholder`)}

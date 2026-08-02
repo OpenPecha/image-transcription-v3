@@ -95,16 +95,13 @@ export type TaskOrientation = 'landscape' | 'portrait'
 export type AssignedTaskState =
   | 'pending'
   | 'annotating'
-  | 'half_annotated'
+  | 'annotated_a'
   | 'annotating_b'
+  | 'annotated_b'
   | 'annotating_c'
   | 'annotated'
   | 'reviewing'
-  | 'half_reviewed'
-  | 'reviewing_b'
   | 'reviewed'
-  | 'finalising'
-  | 'finalised'
   | 'trashed'
 
 export const ITV3_EDITABLE_TASK_STATES = [
@@ -112,25 +109,18 @@ export const ITV3_EDITABLE_TASK_STATES = [
   'annotating_b',
   'annotating_c',
   'reviewing',
-  'reviewing_b',
 ] as const satisfies readonly AssignedTaskState[]
 
-/** Reviewer A/B slots — approve/submit is allowed only in these states. */
+/** Reviewer — approve/submit is allowed only while reviewing. */
 export const ITV3_REVIEWER_APPROVABLE_STATES = [
   'reviewing',
-  'reviewing_b',
-] as const satisfies readonly AssignedTaskState[]
-
-/** Final Reviewer slot — approve/submit is allowed only in this state. */
-export const ITV3_FINAL_REVIEWER_APPROVABLE_STATES = [
-  'finalising',
 ] as const satisfies readonly AssignedTaskState[]
 
 export function isEditableTaskState(state: AssignedTaskState): boolean {
   return (ITV3_EDITABLE_TASK_STATES as readonly string[]).includes(state)
 }
 
-/** Annotator A slot — only this slot may trash/reject a task. */
+/** Annotator A slot — only this slot may trash a task. */
 export function isAnnotatorATaskState(state: AssignedTaskState): boolean {
   return state === 'annotating'
 }
@@ -149,7 +139,7 @@ export function canAnnotatorTrashTask(state: AssignedTaskState): boolean {
   return isAnnotatorATaskState(state)
 }
 
-/** Baseline text shown in the annotator editor (Annotator B is double-blind from Annotator A). */
+/** Baseline text shown in the annotator editor (B/C are double-blind from prior annotators). */
 export function getAnnotatorBaselineTranscript(task: AssignedTask): string {
   if (isAnnotatorBTaskState(task.state) || isAnnotatorCTaskState(task.state)) {
     return (task.initial_transcript?.trim() || task.task_transcript) ?? ''
@@ -157,7 +147,7 @@ export function getAnnotatorBaselineTranscript(task: AssignedTask): string {
   return task.task_transcript ?? ''
 }
 
-/** Single rejection comment record returned on assign (comment_A / comment_B arrays). */
+/** Single rejection comment record returned on assign (comment_A / comment_B / comment_C). */
 export interface RejectionCommentRecord {
   comment: string
   created: string
@@ -167,8 +157,6 @@ export type RejectionHistoryTarget =
   | 'annotator_a'
   | 'annotator_b'
   | 'annotator_c'
-  | 'reviewer_a'
-  | 'reviewer_b'
 
 export interface RejectionHistoryEntry {
   created: string
@@ -182,23 +170,14 @@ export interface TaskRejectionComments {
   comment_C?: RejectionCommentRecord[]
 }
 
-const FINAL_REVIEW_PIPELINE_STATES = [
-  'reviewed',
-  'finalising',
-  'finalised',
-] as const satisfies readonly AssignedTaskState[]
-
-export function isTaskAtOrPastFinalReview(state: AssignedTaskState): boolean {
-  return (FINAL_REVIEW_PIPELINE_STATES as readonly string[]).includes(state)
-}
-
-/** Reviewer A/B slot from assign state. */
-export function isReviewerATaskState(state: AssignedTaskState): boolean {
+/** Reviewer slot from assign state. */
+export function isReviewerTaskState(state: AssignedTaskState): boolean {
   return state === 'reviewing'
 }
 
-export function isReviewerBTaskState(state: AssignedTaskState): boolean {
-  return state === 'reviewing_b'
+/** @deprecated Prefer isReviewerTaskState — ITv3 has a single reviewer slot. */
+export function isReviewerATaskState(state: AssignedTaskState): boolean {
+  return isReviewerTaskState(state)
 }
 
 // Assigned task from real backend API
@@ -207,14 +186,12 @@ export interface AssignedTask {
   task_name: string
   task_url: string
   task_transcript: string
-  /** Slot 1 reference transcript — Annotator A (reviewers) or Reviewer A (final reviewer). */
+  /** Slot 1 reference transcript — Annotator A (for reviewers). */
   task_transcript_1?: string
-  /** Slot 2 reference transcript — Annotator B (reviewers) or Reviewer B (final reviewer). */
+  /** Slot 2 reference transcript — Annotator B (for reviewers). */
   task_transcript_2?: string
-  /** Slot 3 reference transcript — Annotator C. */
+  /** Slot 3 reference transcript — Annotator C (for reviewers). */
   task_transcript_3?: string
-  /** Reviewer's prior submission when reassigned after final-reviewer rejection. */
-  reviewer_transcript?: string
   initial_transcript?: string
   state: AssignedTaskState
   batch_name: string
@@ -225,8 +202,6 @@ export interface AssignedTask {
   annotation_a_rejection_count?: number
   annotation_b_rejection_count?: number
   annotation_c_rejection_count?: number
-  review_a_rejection_count?: number
-  review_b_rejection_count?: number
   comment_A?: RejectionCommentRecord[]
   comment_B?: RejectionCommentRecord[]
   comment_C?: RejectionCommentRecord[]

@@ -2,19 +2,15 @@ import {
   isAnnotatorATaskState,
   isAnnotatorBTaskState,
   isAnnotatorCTaskState,
-  isReviewerATaskState,
-  isReviewerBTaskState,
-  isTaskAtOrPastFinalReview,
+  isReviewerTaskState,
   type AssignedTask,
   type RejectionCommentRecord,
   type RejectionHistoryEntry,
   type RejectionHistoryTarget,
   type TaskRejectionComments,
 } from '@/types'
-import { rejectionCount } from '@/lib/rejection-counts'
 import {
   isAnnotatorRole,
-  isFinalReviewerRole,
   isReviewerRole,
 } from '@/features/workspace/workspace-role-config'
 import { normalizeUserRole } from '@/types'
@@ -23,15 +19,11 @@ export type RejectionHistoryTargetLabelKey =
   | 'rejectionHistory.target.annotatorA'
   | 'rejectionHistory.target.annotatorB'
   | 'rejectionHistory.target.annotatorC'
-  | 'rejectionHistory.target.reviewerA'
-  | 'rejectionHistory.target.reviewerB'
 
 const TARGET_LABEL_KEY: Record<RejectionHistoryTarget, RejectionHistoryTargetLabelKey> = {
   annotator_a: 'rejectionHistory.target.annotatorA',
   annotator_b: 'rejectionHistory.target.annotatorB',
   annotator_c: 'rejectionHistory.target.annotatorC',
-  reviewer_a: 'rejectionHistory.target.reviewerA',
-  reviewer_b: 'rejectionHistory.target.reviewerB',
 }
 
 export function getRejectionHistoryTargetLabelKey(
@@ -44,8 +36,6 @@ const TARGET_SORT_ORDER: RejectionHistoryTarget[] = [
   'annotator_a',
   'annotator_b',
   'annotator_c',
-  'reviewer_a',
-  'reviewer_b',
 ]
 
 function sortTargets(targets: RejectionHistoryTarget[]): RejectionHistoryTarget[] {
@@ -77,7 +67,7 @@ function recordsToEntries(
   )
 }
 
-/** Merge same-timestamp rejections (e.g. reject both) into one timeline row. */
+/** Merge same-timestamp rejections (e.g. reject both/all) into one timeline row. */
 function mergeTimeline(entries: RejectionHistoryEntry[]): RejectionHistoryEntry[] {
   const grouped = new Map<string, RejectionHistoryEntry>()
 
@@ -124,11 +114,7 @@ function slotEntries(
   return recordsToEntries(records, target)
 }
 
-function getAnnotatorVisibleEntries(
-  task: AssignedTask
-): RejectionHistoryEntry[] {
-  if (isTaskAtOrPastFinalReview(task.state)) return []
-
+function getAnnotatorVisibleEntries(task: AssignedTask): RejectionHistoryEntry[] {
   if (isAnnotatorATaskState(task.state)) {
     return slotEntries(task, 'A', 'annotator_a')
   }
@@ -145,31 +131,12 @@ function getAnnotatorVisibleEntries(
 }
 
 function getReviewerVisibleEntries(task: AssignedTask): RejectionHistoryEntry[] {
-  const isReviewerA = isReviewerATaskState(task.state)
-  const isReviewerB = isReviewerBTaskState(task.state)
-  if (!isReviewerA && !isReviewerB) return []
-
-  const returnedToReviewer = rejectionCount(task.rejection_count) > 0
-
-  if (returnedToReviewer || isTaskAtOrPastFinalReview(task.state)) {
-    return isReviewerA
-      ? slotEntries(task, 'A', 'reviewer_a')
-      : slotEntries(task, 'B', 'reviewer_b')
-  }
+  if (!isReviewerTaskState(task.state)) return []
 
   return mergeTimeline([
     ...slotEntries(task, 'A', 'annotator_a'),
     ...slotEntries(task, 'B', 'annotator_b'),
     ...slotEntries(task, 'C', 'annotator_c'),
-  ])
-}
-
-function getFinalReviewerVisibleEntries(task: AssignedTask): RejectionHistoryEntry[] {
-  if (task.state !== 'finalising') return []
-
-  return mergeTimeline([
-    ...slotEntries(task, 'A', 'reviewer_a'),
-    ...slotEntries(task, 'B', 'reviewer_b'),
   ])
 }
 
@@ -186,10 +153,6 @@ export function getVisibleRejectionHistory(
 
   if (isReviewerRole(normalized)) {
     return getReviewerVisibleEntries(task)
-  }
-
-  if (isFinalReviewerRole(normalized)) {
-    return getFinalReviewerVisibleEntries(task)
   }
 
   return []
@@ -214,20 +177,6 @@ export function shouldShowRejectionTargetLabel(
     if (isAnnotatorATaskState(task.state) && target === 'annotator_a') return false
     if (isAnnotatorBTaskState(task.state) && target === 'annotator_b') return false
     if (isAnnotatorCTaskState(task.state) && target === 'annotator_c') return false
-    return true
-  }
-
-  if (isReviewerRole(normalized)) {
-    const returnedToReviewer = rejectionCount(task.rejection_count) > 0
-    const viewingOwnReviewerFeedback =
-      returnedToReviewer || isTaskAtOrPastFinalReview(task.state)
-
-    if (viewingOwnReviewerFeedback) {
-      if (isReviewerATaskState(task.state) && target === 'reviewer_a') return false
-      if (isReviewerBTaskState(task.state) && target === 'reviewer_b') return false
-    }
-
-    return true
   }
 
   return true

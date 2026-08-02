@@ -70,9 +70,9 @@ interface DiffResolverProps {
   toolbar?: ReactNode
   /** Keeps diff choice menus inside the text panel, below the image. */
   menuBoundaryRef?: RefObject<HTMLElement | null>
-  /** Read-only reference tabs: annotators (Reviewer A/B) or reviewers (Final Reviewer). */
+  /** Read-only reference tabs for annotator slots (Reviewer). */
   referenceTabs?: ReferenceTabsMode
-  /** Prior reviewer submission shown when reassigned after final-reviewer rejection. */
+  /** Optional prior submission tab (unused in ITv3 single-reviewer flow). */
   reviewerTranscript?: string
 }
 
@@ -445,19 +445,12 @@ export const DiffResolver = forwardRef<DiffResolverHandle, DiffResolverProps>(fu
   const showReviewerTranscriptTab = reviewerTranscript.trim().length > 0
 
   const referenceTabLabels = useMemo(() => {
-    if (referenceTabs === 'reviewers') {
-      return {
-        tab1: t('diffResolver.reviewer1'),
-        tab2: t('diffResolver.reviewer2'),
-        tab3: undefined,
-      }
-    }
     return {
       tab1: t('diffResolver.annotator1'),
       tab2: t('diffResolver.annotator2'),
       tab3: referenceTranscript3 ? t('diffResolver.annotator3') : undefined,
     }
-  }, [referenceTabs, referenceTranscript3, t])
+  }, [referenceTranscript3, t])
 
   const getPresetOptionLabel = (index: number): string => {
     if (index === 0) return referenceTabLabels.tab1

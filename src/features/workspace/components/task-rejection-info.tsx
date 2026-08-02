@@ -6,12 +6,11 @@ import {
 } from '@/lib/rejection-counts'
 import {
   isAnnotatorRole,
-  isFinalReviewerRole,
   isReviewerRole,
 } from '@/features/workspace/workspace-role-config'
 import { normalizeUserRole } from '@/types'
 
-interface TaskRejectionInfoProps {
+type TaskRejectionInfoProps = {
   task: TaskRejectionCounts
   role: string | undefined
 }
@@ -29,9 +28,7 @@ export function TaskRejectionInfo({ task, role }: TaskRejectionInfoProps) {
 
   const upstreamHeading = isReviewerRole(normalizedRole)
     ? t('sidebar.rejection.priorAnnotationRejections')
-    : isFinalReviewerRole(normalizedRole)
-      ? t('sidebar.rejection.priorReviewRejections')
-      : null
+    : null
 
   return (
     <div className="mt-2 space-y-1.5 text-xs text-amber-700 dark:text-amber-400">

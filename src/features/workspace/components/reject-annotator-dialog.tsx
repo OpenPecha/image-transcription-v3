@@ -1,16 +1,17 @@
 import { RejectSlotDialog, type RejectConfirmParams } from './reject-slot-dialog'
 
-interface RejectAnnotatorDialogProps {
+type RejectAnnotatorDialogProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   onCancel: () => void
   onConfirm: (params: RejectConfirmParams) => void
   isLoading?: boolean
   taskName: string
+  hasAnnotatorC?: boolean
 }
 
 export type { RejectConfirmParams }
 
 export function RejectAnnotatorDialog(props: RejectAnnotatorDialogProps) {
-  return <RejectSlotDialog variant="annotator" {...props} />
+  return <RejectSlotDialog {...props} />
 }

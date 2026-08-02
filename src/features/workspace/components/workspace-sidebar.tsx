@@ -18,22 +18,19 @@ interface WorkspaceSidebarProps {
   isLoading?: boolean
 }
 
-// Status color configuration
+// Status color configuration (ITv3 pipeline)
 const getStateColor = (state: string): string => {
   switch (state) {
     case 'annotating':
     case 'annotating_b':
     case 'annotating_c':
       return 'text-primary fill-primary'
-    case 'reviewing':
-    case 'reviewing_b':
-    case 'half_annotated':
-    case 'half_reviewed':
+    case 'annotated_a':
+    case 'annotated_b':
     case 'annotated':
+    case 'reviewing':
       return 'text-warning fill-warning'
     case 'reviewed':
-    case 'finalising':
-    case 'finalised':
       return 'text-success fill-success'
     case 'trashed':
       return 'text-destructive fill-destructive'

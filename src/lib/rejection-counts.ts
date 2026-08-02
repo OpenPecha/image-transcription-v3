@@ -2,7 +2,7 @@ import type { BatchTaskParticipantRole } from '@/types/batch'
 import { normalizeUserRole, UserRole } from '@/types/user'
 
 /** Rejection count fields shared by assign and batch task responses. */
-export interface TaskRejectionCounts {
+export type TaskRejectionCounts = {
   rejection_count?: number
   annotation_a_rejection_count?: number
   annotation_b_rejection_count?: number
@@ -37,12 +37,12 @@ export function getParticipantRejectionCount(
   return rejectionCount(task[field])
 }
 
-export interface WorkspaceRejectionUpstreamItem {
-  labelKey: 'diffResolver.annotator1' | 'diffResolver.annotator2' | 'diffResolver.annotator3' | 'diffResolver.reviewer1' | 'diffResolver.reviewer2'
+export type WorkspaceRejectionUpstreamItem = {
+  labelKey: 'diffResolver.annotator1' | 'diffResolver.annotator2' | 'diffResolver.annotator3'
   count: number
 }
 
-export interface WorkspaceRejectionDisplay {
+export type WorkspaceRejectionDisplay = {
   returnedCount?: number
   upstream: WorkspaceRejectionUpstreamItem[]
 }
@@ -66,23 +66,6 @@ export function getWorkspaceRejectionDisplay(
         { labelKey: 'diffResolver.annotator1' as const, count: task.annotation_a_rejection_count },
         { labelKey: 'diffResolver.annotator2' as const, count: task.annotation_b_rejection_count },
         { labelKey: 'diffResolver.annotator3' as const, count: task.annotation_c_rejection_count },
-      ] satisfies Array<{ labelKey: WorkspaceRejectionUpstreamItem['labelKey']; count: number | undefined }>
-    )
-      .map((item) => ({ ...item, count: rejectionCount(item.count) }))
-      .filter((item) => item.count > 0)
-
-    if (returned <= 0 && upstream.length === 0) return null
-    return {
-      returnedCount: returned > 0 ? returned : undefined,
-      upstream,
-    }
-  }
-
-  if (normalized === UserRole.FinalReviewer) {
-    const upstream: WorkspaceRejectionUpstreamItem[] = (
-      [
-        { labelKey: 'diffResolver.reviewer1' as const, count: task.review_a_rejection_count },
-        { labelKey: 'diffResolver.reviewer2' as const, count: task.review_b_rejection_count },
       ] satisfies Array<{ labelKey: WorkspaceRejectionUpstreamItem['labelKey']; count: number | undefined }>
     )
       .map((item) => ({ ...item, count: rejectionCount(item.count) }))
