@@ -212,6 +212,7 @@
     "participants": {
       "annotator1": "Annotator A",
       "annotator2": "Annotator B",
+      "annotator3": "Annotator C",
       "reviewer1": "Reviewer A",
       "reviewer2": "Reviewer B",
       "finalReviewer": "Final Reviewer"

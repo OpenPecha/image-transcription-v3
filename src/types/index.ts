@@ -9,11 +9,11 @@ export {
 export type * from './user'
 
 export type {
-  Itv2AnnotatorContributionSummary,
-  Itv2ContributionSummary,
-  Itv2ContributionTask,
-  Itv2FinalReviewerContributionSummary,
-  Itv2ReviewerContributionSummary,
+  Itv3AnnotatorContributionSummary,
+  Itv3ContributionSummary,
+  Itv3ContributionTask,
+  Itv3FinalReviewerContributionSummary,
+  Itv3ReviewerContributionSummary,
   UserContributionReportResponse,
 } from './user-contribution-report'
 
@@ -31,12 +31,13 @@ export {
   TaskAction,
   STATUS_CONFIG,
   VALID_TRANSITIONS,
-  ITV2_EDITABLE_TASK_STATES,
-  ITV2_REVIEWER_APPROVABLE_STATES,
-  ITV2_FINAL_REVIEWER_APPROVABLE_STATES,
+  ITV3_EDITABLE_TASK_STATES,
+  ITV3_REVIEWER_APPROVABLE_STATES,
+  ITV3_FINAL_REVIEWER_APPROVABLE_STATES,
   isEditableTaskState,
   isAnnotatorATaskState,
   isAnnotatorBTaskState,
+  isAnnotatorCTaskState,
   isReviewerATaskState,
   isReviewerBTaskState,
   isTaskAtOrPastFinalReview,

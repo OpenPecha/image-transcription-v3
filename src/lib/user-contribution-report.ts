@@ -1,23 +1,23 @@
 import type {
-  Itv2AnnotatorContributionSummary,
-  Itv2ContributionRejectionMetrics,
-  Itv2ContributionSummary,
-  Itv2FinalReviewerContributionSummary,
-  Itv2RejectionsMadeMetrics,
-  Itv2ReviewerContributionSummary,
+  Itv3AnnotatorContributionSummary,
+  Itv3ContributionRejectionMetrics,
+  Itv3ContributionSummary,
+  Itv3FinalReviewerContributionSummary,
+  Itv3RejectionsMadeMetrics,
+  Itv3ReviewerContributionSummary,
   UserContributionReportResponse,
 } from '@/types/user-contribution-report'
 import { UserRole, normalizeUserRole } from '@/types/user'
 
-export type Itv2ReportRoleSummary =
-  | Itv2AnnotatorContributionSummary
-  | Itv2ReviewerContributionSummary
-  | Itv2FinalReviewerContributionSummary
+export type Itv3ReportRoleSummary =
+  | Itv3AnnotatorContributionSummary
+  | Itv3ReviewerContributionSummary
+  | Itv3FinalReviewerContributionSummary
 
 export function getContributionSummaryForRole(
-  summary: Itv2ContributionSummary | undefined,
+  summary: Itv3ContributionSummary | undefined,
   role: UserRole | string | undefined
-): Itv2ReportRoleSummary | null {
+): Itv3ReportRoleSummary | null {
   if (!summary) return null
 
   const normalized = normalizeUserRole(role)
@@ -28,35 +28,35 @@ export function getContributionSummaryForRole(
 }
 
 export function getSummaryRejectedCount(
-  summary: Itv2ContributionRejectionMetrics | null | undefined
+  summary: Itv3ContributionRejectionMetrics | null | undefined
 ): number {
   if (!summary) return 0
   return summary.rejected_count ?? summary.rejection_count ?? 0
 }
 
 export function getSummaryRejectedPercent(
-  summary: Itv2ContributionRejectionMetrics | null | undefined
+  summary: Itv3ContributionRejectionMetrics | null | undefined
 ): number | undefined {
   if (!summary) return undefined
   return summary.rejected_percent ?? summary.rejection_percent
 }
 
 export function getSummaryUnrejectedTasksPercent(
-  summary: Itv2ContributionRejectionMetrics | null | undefined
+  summary: Itv3ContributionRejectionMetrics | null | undefined
 ): number | undefined {
   if (!summary) return undefined
   return summary.unrejected_tasks_percent ?? summary.unrejected_percent
 }
 
 export function getSummaryRejectionsMadeCount(
-  summary: Itv2RejectionsMadeMetrics | null | undefined
+  summary: Itv3RejectionsMadeMetrics | null | undefined
 ): number {
   if (!summary) return 0
   return summary.rejections_made_count ?? summary.rejections_made ?? 0
 }
 
 export function getSummaryRejectionsMadePercent(
-  summary: (Itv2RejectionsMadeMetrics & Itv2ContributionRejectionMetrics) | null | undefined
+  summary: (Itv3RejectionsMadeMetrics & Itv3ContributionRejectionMetrics) | null | undefined
 ): number | undefined {
   if (!summary) return undefined
   return summary.rejections_made_percent

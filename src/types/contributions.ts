@@ -1,7 +1,7 @@
 import type {
-  Itv2AnnotatorContributionSummary,
-  Itv2FinalReviewerContributionSummary,
-  Itv2ReviewerContributionSummary,
+  Itv3AnnotatorContributionSummary,
+  Itv3FinalReviewerContributionSummary,
+  Itv3ReviewerContributionSummary,
 } from './user-contribution-report'
 
 /** Query params for GET /contributions/{application_name}/{group_id}/summary */
@@ -10,17 +10,17 @@ export interface ContributionSummaryQueryParams {
   end_date: string
 }
 
-export interface AnnotatorContributionRow extends Itv2AnnotatorContributionSummary {
+export interface AnnotatorContributionRow extends Itv3AnnotatorContributionSummary {
   user_id: string
   username: string
 }
 
-export interface ReviewerContributionRow extends Itv2ReviewerContributionSummary {
+export interface ReviewerContributionRow extends Itv3ReviewerContributionSummary {
   user_id: string
   username: string
 }
 
-export interface FinalReviewerContributionRow extends Itv2FinalReviewerContributionSummary {
+export interface FinalReviewerContributionRow extends Itv3FinalReviewerContributionSummary {
   user_id: string
   username: string
 }

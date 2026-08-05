@@ -19,7 +19,9 @@
     "reject": "དང་ལེན་མི་བྱེད།",
     "rejectAnnotatorA": "Annotator A དང་ལེན་མི་བྱེད།",
     "rejectAnnotatorB": "Annotator B དང་ལེན་མི་བྱེད།",
+    "rejectAnnotatorC": "Annotator C དང་ལེན་མི་བྱེད།",
     "rejectBoth": "Annotator གཉིས་ཀ དང་ལེན་མི་བྱེད།",
+    "rejectAll": "Annotator ཚང་མ དང་ལེན་མི་བྱེད།",
     "rejectReviewerA": "Reviewer A དང་ལེན་མི་བྱེད།",
     "rejectReviewerB": "Reviewer B དང་ལེན་མི་བྱེད།",
     "rejectBothReviewers": "Reviewer གཉིས་ཀ དང་ལེན་མི་བྱེད།"
@@ -131,6 +133,7 @@
     "target": {
       "annotatorA": "Annotator A",
       "annotatorB": "Annotator B",
+      "annotatorC": "Annotator C",
       "reviewerA": "Reviewer A",
       "reviewerB": "Reviewer B"
     },
@@ -156,6 +159,7 @@
     "previewPlaceholder": "ཐག་བཅད་ཟིན་པའི་སྔོན་ལྟ་འདིར་འཆར་རྒྱུ་ཡིན།",
     "annotator1": "ཡིག་འགྲིག་པ་ ཀ",
     "annotator2": "ཡིག་འགྲིག་པ་ ཁ",
+    "annotator3": "ཡིག་འགྲིག་པ་ ག",
     "reviewer1": "ཞིབ་བཤེར་པ་ ཀ",
     "reviewer2": "ཞིབ་བཤེར་པ་ ཁ",
     "previousReview": "སྔོན་གྱི་ཞིབ་བཤེར།",
@@ -173,7 +177,7 @@
     "whitespaceNewline": "ཐིག་གསར་པ།"
   },
   "reviewer": {
-    "pendingAlignment": "ཡིག་འགྲིག་པ་གཉིས་ཀྱི་བསྡུར་བའི་སྒུག་བཞིན་པ། ཡིག་འགྲིག་གཉིས་པོ་ཚང་མ་གྲུབ་རྗེས་ཁྱད་པར་འདིར་འཆར་རྒྱུ་ཡིན།",
+    "pendingAlignment": "ཡིག་འགྲིག་པའི་བསྡུར་བའི་སྒུག་བཞིན་པ། ཡིག་འགྲིག་ཚང་མ་གྲུབ་རྗེས་ཁྱད་པར་འདིར་འཆར་རྒྱུ་ཡིན།",
     "noDiffsToResolve": "ཐག་ཆོད་རྒྱུའི་ཁྱད་པར་མེད། ཡིག་འགྲིག་པ་གཉིས་མོ་འདྲ་བར་མོས་མཐུན། འོག་གི་ཡིག་འགྲིག་བསྐྱར་ཞིབ་བྱས་ནས་ཆོག་མཆན་སྤྲོད།",
     "emptyTranscript": "ད་དུང་ཡིག་འགྲིག་མེད།"
   },

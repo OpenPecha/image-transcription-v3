@@ -6,6 +6,7 @@ export interface TaskRejectionCounts {
   rejection_count?: number
   annotation_a_rejection_count?: number
   annotation_b_rejection_count?: number
+  annotation_c_rejection_count?: number
   review_a_rejection_count?: number
   review_b_rejection_count?: number
 }
@@ -20,6 +21,7 @@ const SLOT_REJECTION_FIELD: Record<
 > = {
   annotator_a: 'annotation_a_rejection_count',
   annotator_b: 'annotation_b_rejection_count',
+  annotator_c: 'annotation_c_rejection_count',
   reviewer_a: 'review_a_rejection_count',
   reviewer_b: 'review_b_rejection_count',
   final_reviewer: null,
@@ -36,7 +38,7 @@ export function getParticipantRejectionCount(
 }
 
 export interface WorkspaceRejectionUpstreamItem {
-  labelKey: 'diffResolver.annotator1' | 'diffResolver.annotator2' | 'diffResolver.reviewer1' | 'diffResolver.reviewer2'
+  labelKey: 'diffResolver.annotator1' | 'diffResolver.annotator2' | 'diffResolver.annotator3' | 'diffResolver.reviewer1' | 'diffResolver.reviewer2'
   count: number
 }
 
@@ -63,6 +65,7 @@ export function getWorkspaceRejectionDisplay(
       [
         { labelKey: 'diffResolver.annotator1' as const, count: task.annotation_a_rejection_count },
         { labelKey: 'diffResolver.annotator2' as const, count: task.annotation_b_rejection_count },
+        { labelKey: 'diffResolver.annotator3' as const, count: task.annotation_c_rejection_count },
       ] satisfies Array<{ labelKey: WorkspaceRejectionUpstreamItem['labelKey']; count: number | undefined }>
     )
       .map((item) => ({ ...item, count: rejectionCount(item.count) }))

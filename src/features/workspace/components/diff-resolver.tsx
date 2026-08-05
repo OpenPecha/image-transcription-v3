@@ -58,6 +58,7 @@ interface DiffResolverProps {
   previewText: string
   referenceTranscript1: string
   referenceTranscript2: string
+  referenceTranscript3?: string
   /** Comparison transcript with `<t-diff>` tags for reference-tab highlights. */
   comparisonTranscript?: string
   fontFamily: EditorFontFamily
@@ -152,6 +153,7 @@ export const DiffResolver = forwardRef<DiffResolverHandle, DiffResolverProps>(fu
     previewText,
     referenceTranscript1,
     referenceTranscript2,
+    referenceTranscript3,
     comparisonTranscript,
     fontFamily,
     fontSize,
@@ -441,28 +443,67 @@ export const DiffResolver = forwardRef<DiffResolverHandle, DiffResolverProps>(fu
   const resolvedFontFamily = FONT_FAMILY_MAP[fontFamily]
   const showReferenceTabs = referenceTabs !== 'none'
   const showReviewerTranscriptTab = reviewerTranscript.trim().length > 0
-  const referenceTabLabels =
-    referenceTabs === 'reviewers'
-      ? { tab1: t('diffResolver.reviewer1'), tab2: t('diffResolver.reviewer2') }
-      : { tab1: t('diffResolver.annotator1'), tab2: t('diffResolver.annotator2') }
+
+  const referenceTabLabels = useMemo(() => {
+    if (referenceTabs === 'reviewers') {
+      return {
+        tab1: t('diffResolver.reviewer1'),
+        tab2: t('diffResolver.reviewer2'),
+        tab3: undefined,
+      }
+    }
+    return {
+      tab1: t('diffResolver.annotator1'),
+      tab2: t('diffResolver.annotator2'),
+      tab3: referenceTranscript3 ? t('diffResolver.annotator3') : undefined,
+    }
+  }, [referenceTabs, referenceTranscript3, t])
 
   const getPresetOptionLabel = (index: number): string => {
     if (index === 0) return referenceTabLabels.tab1
     if (index === 1) return referenceTabLabels.tab2
+    if (index === 2 && referenceTabLabels.tab3) return referenceTabLabels.tab3
     return t('diffResolver.optionPreset', { label: getAnnotatorOptionLabel(index) })
   }
 
+  const presetSummaryText = useMemo(() => {
+    if (!showReferenceTabs || diffSegments.length === 0) return ''
+    const parts = [
+      `${referenceTabLabels.tab1}: ${presetChoiceCounts.countA}`,
+      `${referenceTabLabels.tab2}: ${presetChoiceCounts.countB}`,
+    ]
+    if (referenceTranscript3 && referenceTabLabels.tab3) {
+      parts.push(`${referenceTabLabels.tab3}: ${presetChoiceCounts.countC}`)
+    }
+    return parts.join(' · ')
+  }, [showReferenceTabs, diffSegments.length, referenceTabLabels, presetChoiceCounts, referenceTranscript3])
+
   const referenceHighlightStats = useMemo(() => {
     if (referenceTabs !== 'annotators') return null
-    if (activeTab !== 'reference1' && activeTab !== 'reference2') return null
+    if (activeTab !== 'reference1' && activeTab !== 'reference2' && activeTab !== 'reference3') return null
 
-    const isPrimarySlot = activeTab === 'reference1'
-    const value = isPrimarySlot ? referenceTranscript1 : referenceTranscript2
-    const otherValue = isPrimarySlot ? referenceTranscript2 : referenceTranscript1
+    let value = ''
+    let otherValue = ''
+    let optionIndex = 0
+
+    if (activeTab === 'reference1') {
+      value = referenceTranscript1
+      otherValue = referenceTranscript2 || (referenceTranscript3 ?? '')
+      optionIndex = 0
+    } else if (activeTab === 'reference2') {
+      value = referenceTranscript2
+      otherValue = referenceTranscript1
+      optionIndex = 1
+    } else if (activeTab === 'reference3') {
+      value = referenceTranscript3 ?? ''
+      otherValue = referenceTranscript1
+      optionIndex = 2
+    }
+
     const segments = buildAnnotatorSlotReferenceSegments({
       value,
       otherValue,
-      isPrimarySlot,
+      optionIndex,
       comparisonTranscript,
     })
 
@@ -472,6 +513,7 @@ export const DiffResolver = forwardRef<DiffResolverHandle, DiffResolverProps>(fu
     referenceTabs,
     referenceTranscript1,
     referenceTranscript2,
+    referenceTranscript3,
     comparisonTranscript,
   ])
 
@@ -502,6 +544,11 @@ export const DiffResolver = forwardRef<DiffResolverHandle, DiffResolverProps>(fu
               <TabsTrigger value="reference2" className="text-xs">
                 {referenceTabLabels.tab2}
               </TabsTrigger>
+              {referenceTabLabels.tab3 && (
+                <TabsTrigger value="reference3" className="text-xs">
+                  {referenceTabLabels.tab3}
+                </TabsTrigger>
+              )}
             </>
           )}
           {showReviewerTranscriptTab && (
@@ -512,14 +559,9 @@ export const DiffResolver = forwardRef<DiffResolverHandle, DiffResolverProps>(fu
         </TabsList>
 
         <div className="flex shrink-0 flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-2">
-          {showReferenceTabs && diffSegments.length > 0 && (
+          {presetSummaryText && (
             <span className="text-xs text-muted-foreground">
-              {t('diffResolver.presetChoiceSummary', {
-                labelA: referenceTabLabels.tab1,
-                countA: presetChoiceCounts.countA,
-                labelB: referenceTabLabels.tab2,
-                countB: presetChoiceCounts.countB,
-              })}
+              {presetSummaryText}
             </span>
           )}
           <div className="text-xs font-semibold select-none">
@@ -817,8 +859,8 @@ export const DiffResolver = forwardRef<DiffResolverHandle, DiffResolverProps>(fu
           >
             <AnnotatorReadonlyPanel
               value={referenceTranscript1}
-              otherValue={referenceTranscript2}
-              isPrimarySlot
+              otherValue={referenceTranscript2 || referenceTranscript3}
+              optionIndex={0}
               comparisonTranscript={comparisonTranscript}
               placeholder={t('diffResolver.referencePlaceholder')}
               fontFamily={resolvedFontFamily}
@@ -833,13 +875,30 @@ export const DiffResolver = forwardRef<DiffResolverHandle, DiffResolverProps>(fu
             <AnnotatorReadonlyPanel
               value={referenceTranscript2}
               otherValue={referenceTranscript1}
-              isPrimarySlot={false}
+              optionIndex={1}
               comparisonTranscript={comparisonTranscript}
               placeholder={t('diffResolver.referencePlaceholder')}
               fontFamily={resolvedFontFamily}
               fontSize={fontSize}
             />
           </TabsContent>
+
+          {referenceTranscript3 && (
+            <TabsContent
+              value="reference3"
+              className="flex-1 flex flex-col min-h-0 m-0 border-none outline-none overflow-hidden"
+            >
+              <AnnotatorReadonlyPanel
+                value={referenceTranscript3}
+                otherValue={referenceTranscript1}
+                optionIndex={2}
+                comparisonTranscript={comparisonTranscript}
+                placeholder={t('diffResolver.referencePlaceholder')}
+                fontFamily={resolvedFontFamily}
+                fontSize={fontSize}
+              />
+            </TabsContent>
+          )}
         </>
       )}
 

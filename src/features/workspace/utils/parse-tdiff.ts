@@ -156,20 +156,22 @@ export function allDiffsResolved(segments: Segment[]): boolean {
   return segments.every((seg) => seg.type !== 'diff' || isDiffResolved(seg))
 }
 
-/** Count confirmed preset resolutions for slot A (index 0) and B (index 1). Custom choices are excluded. */
+/** Count confirmed preset resolutions for slots A/B/C (indexes 0/1/2). Custom choices are excluded. */
 export function countPresetResolutionChoices(
   diffSegments: DiffSegment[]
-): { countA: number; countB: number } {
+): { countA: number; countB: number; countC: number } {
   let countA = 0
   let countB = 0
+  let countC = 0
 
   for (const seg of diffSegments) {
     if (!isDiffResolved(seg) || seg.selected?.kind !== 'preset') continue
     if (seg.selected.index === 0) countA++
     else if (seg.selected.index === 1) countB++
+    else if (seg.selected.index === 2) countC++
   }
 
-  return { countA, countB }
+  return { countA, countB, countC }
 }
 
 export function getNextDiffId(segments: Segment[]): number {

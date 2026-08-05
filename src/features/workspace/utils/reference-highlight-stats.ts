@@ -10,12 +10,12 @@ export type ReferenceHighlightStats = {
 export function buildAnnotatorSlotReferenceSegments({
   value,
   otherValue,
-  isPrimarySlot,
+  optionIndex,
   comparisonTranscript,
 }: {
   value: string
   otherValue: string
-  isPrimarySlot: boolean
+  optionIndex: number
   comparisonTranscript?: string
 }): ReferenceSegment[] {
   if (!value.trim()) return []
@@ -23,11 +23,10 @@ export function buildAnnotatorSlotReferenceSegments({
   if (!otherValue.trim()) return [{ type: 'default', text: value }]
 
   if (comparisonTranscript && hasTDiffMarkup(comparisonTranscript)) {
-    const optionIndex = isPrimarySlot ? 0 : 1
     return buildTDiffReferenceSegments(comparisonTranscript, optionIndex)
   }
 
-  return buildStackReferenceSegments(value, otherValue, isPrimarySlot)
+  return buildStackReferenceSegments(value, otherValue, optionIndex === 0)
 }
 
 export function computeReferenceHighlightStats(

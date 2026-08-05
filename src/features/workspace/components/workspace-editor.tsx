@@ -543,6 +543,7 @@ export function WorkspaceEditor() {
                 previewText={previewText}
                 referenceTranscript1={task.task_transcript_1 ?? ''}
                 referenceTranscript2={task.task_transcript_2 ?? ''}
+                referenceTranscript3={task.task_transcript_3 ?? ''}
                 comparisonTranscript={baseTranscript}
                 fontFamily={editorFontFamily}
                 fontSize={editorFontSize}
