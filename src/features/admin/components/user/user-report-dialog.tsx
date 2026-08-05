@@ -12,6 +12,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
+import { AdminFeatureUnavailable } from '@/features/admin/components/admin-feature-unavailable'
+import { ADMIN_FEATURE_AVAILABILITY } from '@/features/admin/lib/admin-feature-availability'
 import { cn } from '@/lib/utils'
 import {
   formatReportCountSum,
@@ -75,6 +77,25 @@ export function UserReportDialog({ open, onOpenChange, user }: UserReportDialogP
     appliedFilters,
     open
   )
+
+  if (!ADMIN_FEATURE_AVAILABILITY.contributions) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>
+              {t('users.report.title')} - {user.username}
+            </DialogTitle>
+            <DialogDescription>{t('users.report.description')}</DialogDescription>
+          </DialogHeader>
+          <AdminFeatureUnavailable
+            title={t('featureAvailability.contributionsTitle')}
+            description={t('featureAvailability.contributionsDescription')}
+          />
+        </DialogContent>
+      </Dialog>
+    )
+  }
 
   const tasks = report?.tasks ?? []
   const roleSummary = getContributionSummaryForRole(

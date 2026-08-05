@@ -13,7 +13,7 @@ This guide walks a new developer through setting up TextAlign locally from scrat
 
 ```bash
 git clone <repo-url>
-cd image-transcription
+cd image-transcription-v3
 npm install
 ```
 
@@ -37,7 +37,7 @@ VITE_DEV_AUTH=true
 | `VITE_BASE_URL` | Backend API base URL. Defaults to `http://localhost:3000` if omitted. |
 | `VITE_DEV_AUTH` | Set to `true` to bypass Auth0. API requests use a placeholder `dev-token`. |
 
-**Sign in:** open `/login`, enter a user email that exists in the backend (for example `annotator_1@itv2_ume.e2e-test.local`), then click **Dev sign in**. You can also pass `?email=user@example.com` in the URL.
+**Sign in:** open `/login`, enter a user email that exists in the backend, then click **Dev sign in**. You can also pass `?email=user@example.com` in the URL.
 
 Dev auth is also enabled automatically when Auth0 credentials are missing, or when `?dev=true` is in the URL (stored in `localStorage` as `dev_auth_mode`).
 
@@ -98,7 +98,6 @@ The backend expects users to carry one of these roles in their Auth0 profile. As
 | Admin | `admin` |
 | Annotator | `annotator` |
 | Reviewer | `reviewer` |
-| Final Reviewer | `final reviewer` |
 
 A user who logs in without an assigned role lands on the `/pending-approval` page until an admin grants them a role.
 

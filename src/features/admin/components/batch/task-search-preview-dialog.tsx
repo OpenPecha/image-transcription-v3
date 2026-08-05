@@ -11,6 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { ADMIN_FEATURE_AVAILABILITY } from '@/features/admin/lib/admin-feature-availability'
 import { ImageCanvas } from '@/features/workspace/components/image-canvas'
 import { cn } from '@/lib/utils'
 import {
@@ -138,7 +139,7 @@ export function TaskSearchPreviewDialog({
           </div>
         </div>
 
-        {task.batch_id && (
+        {task.batch_id && ADMIN_FEATURE_AVAILABILITY.batchTaskListing && (
           <div className="flex justify-end border-t border-border bg-card px-6 py-3">
             <Button variant="outline" size="sm" onClick={handleOpenInBatch}>
               {t('batches.openInBatch')}

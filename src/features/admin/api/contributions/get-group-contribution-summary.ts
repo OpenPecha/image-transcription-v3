@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { ADMIN_FEATURE_AVAILABILITY } from '@/features/admin/lib/admin-feature-availability'
 import { apiClient } from '@/lib/axios'
 import { APPLICATION_NAME } from '@/lib/constant'
 import type {
@@ -56,7 +57,7 @@ export function useGroupContributionSummaryOverall(options: {
   return useQuery({
     queryKey: contributionKeys.summaryOverall(groupId ?? 'none'),
     queryFn: () => getGroupContributionSummary(groupId as string),
-    enabled: Boolean(groupId) && enabled,
+    enabled: ADMIN_FEATURE_AVAILABILITY.contributions && Boolean(groupId) && enabled,
     staleTime: CONTRIBUTIONS_CACHE_MS,
     gcTime: CONTRIBUTIONS_CACHE_MS,
     retry: 1,
@@ -81,7 +82,7 @@ export function useGroupContributionSummaryFiltered(options: {
         start_date: period.start,
         end_date: period.end,
       }),
-    enabled: Boolean(groupId) && enabled,
+    enabled: ADMIN_FEATURE_AVAILABILITY.contributions && Boolean(groupId) && enabled,
     staleTime: CONTRIBUTIONS_CACHE_MS,
     gcTime: CONTRIBUTIONS_CACHE_MS,
     retry: 1,

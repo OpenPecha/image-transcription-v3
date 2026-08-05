@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Loader2, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { ADMIN_FEATURE_AVAILABILITY } from '@/features/admin/lib/admin-feature-availability'
 import { cn } from '@/lib/utils'
 import { BATCH_STATS_CONFIG, type BatchTaskSearchResult, type BatchTaskState } from '@/types'
 import {
@@ -12,6 +13,20 @@ import {
 import { TaskSearchPreviewDialog } from './task-search-preview-dialog'
 
 export function BatchTaskSearch() {
+  const { t } = useTranslation(['admin', 'common'])
+
+  if (!ADMIN_FEATURE_AVAILABILITY.batchTaskSearch) {
+    return (
+      <p className="text-sm text-muted-foreground">
+        {t('featureAvailability.batchTaskSearchUnavailable')}
+      </p>
+    )
+  }
+
+  return <AvailableBatchTaskSearch />
+}
+
+function AvailableBatchTaskSearch() {
   const { t } = useTranslation(['admin', 'common'])
   const [query, setQuery] = useState('')
   const [submittedQuery, setSubmittedQuery] = useState('')

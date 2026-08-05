@@ -240,6 +240,14 @@
       "failedDescription": "Failed to upload batch. Please try again."
     }
   },
+  "featureAvailability": {
+    "batchTasksTitle": "Batch tasks are not available yet",
+    "batchTasksDescription": "Task listing and CSV export are not implemented by the Image Transcription V3 backend yet. Batch reports remain available.",
+    "batchExportUnavailable": "CSV export is not available for Image Transcription V3 yet",
+    "batchTaskSearchUnavailable": "Task search is not available for Image Transcription V3 yet.",
+    "contributionsTitle": "Contribution reports are not available yet",
+    "contributionsDescription": "User and group contribution reports are not implemented by the Image Transcription V3 backend yet."
+  },
   "common": {
     "cancel": "Cancel",
     "save": "Save",

@@ -240,6 +240,14 @@
       "failedDescription": "ཚོ་སྒྲིག་འགེལ་མ་ཐུབ། ཡང་བསྐྱར་ཚོད་ལྟ།"
     }
   },
+  "featureAvailability": {
+    "batchTasksTitle": "ཚོ་སྒྲིག་གི་ལས་ཀ་ད་ལྟ་སྤྱོད་མི་ཐུབ།",
+    "batchTasksDescription": "Image Transcription V3 ཞབས་ཞུས་ཚོ་སྒྲིག་ལས་ཀའི་ཐོ་དང་ CSV ཕྱིར་འདྲེན་ད་དུང་མ་བཟོས། ཚོ་སྒྲིག་སྙན་ཐོ་སྤྱོད་ཐུབ།",
+    "batchExportUnavailable": "Image Transcription V3 ལ་ CSV ཕྱིར་འདྲེན་ད་ལྟ་སྤྱོད་མི་ཐུབ།",
+    "batchTaskSearchUnavailable": "Image Transcription V3 ལ་ལས་ཀ་འཚོལ་བ་ད་ལྟ་སྤྱོད་མི་ཐུབ།",
+    "contributionsTitle": "བྱས་རྗེས་སྙན་ཐོ་ད་ལྟ་སྤྱོད་མི་ཐུབ།",
+    "contributionsDescription": "Image Transcription V3 ཞབས་ཞུས་སྤྱོད་མཁན་དང་སྡེ་ཚན་གྱི་བྱས་རྗེས་སྙན་ཐོ་ད་དུང་མ་བཟོས།"
+  },
   "common": {
     "cancel": "དོར།",
     "save": "ཉར།",

@@ -3,6 +3,9 @@ import { useTranslation } from 'react-i18next'
 import { useSearchParams, useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, Download, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { ADMIN_FEATURE_AVAILABILITY } from '@/features/admin/lib/admin-feature-availability'
+import { cn } from '@/lib/utils'
+import { BATCH_STATS_CONFIG, type BatchTask, type BatchTaskState } from '@/types'
 import {
   Select,
   SelectContent,
@@ -16,8 +19,7 @@ import { useGetBatchTasks, useRestoreTask, useGetBatchReport } from '../../../ap
 import { useBatchCsvDownload } from '../../../hooks/use-batch-csv-download'
 import { TaskListSidebar } from './task-list-sidebar'
 import { TaskPreview } from './task-preview'
-import { BATCH_STATS_CONFIG, type BatchTask, type BatchTaskState } from '@/types'
-import { cn } from '@/lib/utils'
+import { UnavailableBatchTaskView } from './unavailable-batch-task-view'
 
 const STATE_OPTION_KEYS: Array<{ value: BatchTaskState | 'all'; key: string }> = [
   { value: 'all', key: 'batches.states.all' },
@@ -30,6 +32,14 @@ const STATE_OPTION_KEYS: Array<{ value: BatchTaskState | 'all'; key: string }> =
 ]
 
 export function BatchTaskView() {
+  if (!ADMIN_FEATURE_AVAILABILITY.batchTaskListing) {
+    return <UnavailableBatchTaskView />
+  }
+
+  return <AvailableBatchTaskView />
+}
+
+function AvailableBatchTaskView() {
   const { t } = useTranslation('admin')
   const { batchId } = useParams<{ batchId: string }>()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -48,7 +58,11 @@ export function BatchTaskView() {
   const restoringRef = useRef(false)
 
   // CSV download hook
-  const { download: downloadCsv, isDownloading } = useBatchCsvDownload({
+  const {
+    download: downloadCsv,
+    isDownloading,
+    isAvailable: isExportAvailable,
+  } = useBatchCsvDownload({
     batchId: batchId!,
     onError: (error) => {
       addToast({
@@ -209,9 +223,13 @@ export function BatchTaskView() {
             variant="outline"
             size="icon"
             onClick={downloadCsv}
-            disabled={isDownloading || isLoadingReport}
+            disabled={!isExportAvailable || isDownloading || isLoadingReport}
             className="h-9 w-9"
-            title={t('batches.downloadCsv')}
+            title={
+              isExportAvailable
+                ? t('batches.downloadCsv')
+                : t('featureAvailability.batchExportUnavailable')
+            }
           >
             {isDownloading ? (
               <Loader2 className="h-4 w-4 animate-spin" />

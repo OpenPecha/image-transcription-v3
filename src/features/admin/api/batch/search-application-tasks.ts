@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { ADMIN_FEATURE_AVAILABILITY } from '@/features/admin/lib/admin-feature-availability'
 import { apiClient } from '@/lib/axios'
 import { APPLICATION_NAME } from '@/lib/constant'
 import type { BatchTaskSearchResult } from '@/types'
@@ -22,7 +23,9 @@ const searchApplicationTasks = async (
 
 export const useSearchApplicationTasks = (submittedTaskName: string) => {
   const trimmedTaskName = submittedTaskName.trim()
-  const enabled = trimmedTaskName.length >= MIN_SEARCH_LENGTH
+  const enabled =
+    ADMIN_FEATURE_AVAILABILITY.batchTaskSearch &&
+    trimmedTaskName.length >= MIN_SEARCH_LENGTH
 
   return useQuery({
     queryKey: batchKeys.taskSearch(APPLICATION_NAME, trimmedTaskName),
