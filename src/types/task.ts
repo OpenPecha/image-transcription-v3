@@ -123,12 +123,12 @@ export function isAnnotatorATaskState(state: AssignedTaskState): boolean {
   return state === 'annotating'
 }
 
-/** Annotator B slot — receives baseline OCR via initial_transcript, cannot trash. */
+/** Annotator B slot — baseline OCR arrives as task_transcript (double-blind), cannot trash. */
 export function isAnnotatorBTaskState(state: AssignedTaskState): boolean {
   return state === 'annotating_b'
 }
 
-/** Annotator C slot — receives baseline OCR via initial_transcript, cannot trash. */
+/** Annotator C slot — baseline OCR arrives as task_transcript (double-blind), cannot trash. */
 export function isAnnotatorCTaskState(state: AssignedTaskState): boolean {
   return state === 'annotating_c'
 }
@@ -137,12 +137,12 @@ export function canAnnotatorTrashTask(state: AssignedTaskState): boolean {
   return isAnnotatorATaskState(state)
 }
 
-/** Baseline text shown in the annotator editor (B/C are double-blind from prior annotators). */
+/**
+ * Baseline text shown in the annotator editor.
+ * Backend returns COALESCE(slot, InitialTranscript) as task_transcript for A/B/C.
+ */
 export function getAnnotatorBaselineTranscript(task: AssignedTask): string {
-  if (isAnnotatorBTaskState(task.state) || isAnnotatorCTaskState(task.state)) {
-    return (task.initial_transcript?.trim() || task.task_transcript) ?? ''
-  }
-  return task.task_transcript ?? ''
+  return task.task_transcript?.trim() || ''
 }
 
 /** Single rejection comment record returned on assign (comment_A / comment_B / comment_C). */
@@ -178,28 +178,27 @@ export function isReviewerATaskState(state: AssignedTaskState): boolean {
   return isReviewerTaskState(state)
 }
 
-// Assigned task from real backend API
+// Assigned task from imagetranscriptionv3 assign endpoint
 export interface AssignedTask {
   task_id: string
   task_name: string
   task_url: string
-  task_transcript: string
+  /** Annotator: COALESCE(slot, InitialTranscript). Reviewer: comparison diff (FDMP). */
+  task_transcript?: string | null
   /** Slot 1 reference transcript — Annotator A (for reviewers). */
   task_transcript_1?: string
   /** Slot 2 reference transcript — Annotator B (for reviewers). */
   task_transcript_2?: string
   /** Slot 3 reference transcript — Annotator C (for reviewers). */
   task_transcript_3?: string
-  initial_transcript?: string
+  /** Reviewer only: previous reviewed transcript on sticky resume. */
+  reviewer_transcript?: string | null
   state: AssignedTaskState
-  batch_name: string
-  group: string
+  batch_id: string
+  group_id: string
   orientation?: TaskOrientation
-  /** Times this assignment was returned to the current worker. */
+  /** Times this assignment was returned to the current worker (annotator slot). */
   rejection_count?: number
-  annotation_a_rejection_count?: number
-  annotation_b_rejection_count?: number
-  annotation_c_rejection_count?: number
   comment_A?: RejectionCommentRecord[]
   comment_B?: RejectionCommentRecord[]
   comment_C?: RejectionCommentRecord[]

@@ -7,7 +7,6 @@ type RejectAnnotatorDialogProps = {
   onConfirm: (params: RejectConfirmParams) => void
   isLoading?: boolean
   taskName: string
-  hasAnnotatorC?: boolean
 }
 
 export type { RejectConfirmParams }

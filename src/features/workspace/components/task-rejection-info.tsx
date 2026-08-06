@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { RotateCcw } from 'lucide-react'
 import {
   getWorkspaceRejectionDisplay,
-  type TaskRejectionCounts,
+  type WorkspaceRejectionSource,
 } from '@/lib/rejection-counts'
 import {
   isAnnotatorRole,
@@ -11,7 +11,7 @@ import {
 import { normalizeUserRole } from '@/types'
 
 type TaskRejectionInfoProps = {
-  task: TaskRejectionCounts
+  task: WorkspaceRejectionSource
   role: string | undefined
 }
 

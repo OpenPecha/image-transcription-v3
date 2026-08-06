@@ -157,13 +157,25 @@ export function WorkspaceEditor() {
   const isLoadingNextTask = isFetching && !isLoading
   const showOverlay = isLoadingNextTask || isMutating
 
+  const transcriptForSubmit = usesDiffResolver ? resolvedText : text
+  const canSubmitTranscript = canEdit && transcriptForSubmit.trim().length > 0
+
   const canApprove = useMemo(() => {
     if (!usesApproveAction || !canActOnTask || isMutating) return false
+    if (!transcriptForSubmit.trim()) return false
+    if (usesDiffResolver && !baseTranscript.trim()) return false
     if (!usesDiffResolver || !hasDiffSegments) return true
     return allDiffsResolved(segments)
-  }, [usesApproveAction, canActOnTask, isMutating, usesDiffResolver, hasDiffSegments, segments])
-
-  const transcriptForSubmit = usesDiffResolver ? resolvedText : text
+  }, [
+    usesApproveAction,
+    canActOnTask,
+    isMutating,
+    transcriptForSubmit,
+    baseTranscript,
+    usesDiffResolver,
+    hasDiffSegments,
+    segments,
+  ])
 
   // Sync editor state when the assigned task changes
   useEffect(() => {
@@ -208,7 +220,6 @@ export function WorkspaceEditor() {
   }, [
     task?.task_id,
     task?.task_transcript,
-    task?.initial_transcript,
     task?.state,
     usesDiffResolver,
   ])
@@ -526,6 +537,7 @@ export function WorkspaceEditor() {
                 referenceTranscript1={task.task_transcript_1 ?? ''}
                 referenceTranscript2={task.task_transcript_2 ?? ''}
                 referenceTranscript3={task.task_transcript_3 ?? ''}
+                reviewerTranscript={task.reviewer_transcript ?? ''}
                 comparisonTranscript={baseTranscript}
                 fontFamily={editorFontFamily}
                 fontSize={editorFontSize}
@@ -594,7 +606,7 @@ export function WorkspaceEditor() {
                 <Button
                   variant="success"
                   onClick={() => setSubmitDialogOpen(true)}
-                  disabled={showOverlay || !canEdit}
+                  disabled={showOverlay || !canSubmitTranscript}
                 >
                   <Send className="h-4 w-4 mr-2" />
                   {submitTask.isPending ? t('actions.submitting') : t('actions.submit')}

@@ -18,7 +18,7 @@ import { BatchTaskSearch } from './batch-task-search'
 export function BatchList() {
   const { t } = useTranslation('admin')
   const { data: batches = [], isLoading } = useGetBatches()
-  const { data: applicationReport, isLoading: isApplicationReportLoading } =
+  const { data: applicationReport, isLoading: isApplicationReportLoading, isError: isApplicationReportError } =
     useGetApplicationBatchReport(APPLICATION_NAME)
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false)
   
@@ -43,13 +43,14 @@ export function BatchList() {
             <ApplicationBatchSummary
               report={applicationReport}
               isLoading={isApplicationReportLoading}
+              isError={isApplicationReportError}
             />
           </div>
 
           <div className="mb-4 border-b" />
 
           <div className="mb-3 text-sm font-semibold tracking-tight">
-            Individual Batches
+            {t('batches.individualBatches')}
           </div>
 
           {isLoading ? (

@@ -80,7 +80,6 @@ export function useRejectAnnotatorFlow({
       onConfirm: confirmReject,
       isLoading: rejectTask.isPending,
       taskName: task?.task_name ?? '',
-      hasAnnotatorC: Boolean(task?.task_transcript_3),
     },
     isRejecting: rejectTask.isPending,
   }

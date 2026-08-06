@@ -1,4 +1,5 @@
 import type { BatchTaskParticipantRole } from '@/types/batch'
+import type { RejectionCommentRecord } from '@/types/task'
 import { normalizeUserRole, UserRole } from '@/types/user'
 
 /** Rejection count fields shared by assign and batch task responses. */
@@ -9,6 +10,13 @@ export type TaskRejectionCounts = {
   annotation_c_rejection_count?: number
   review_a_rejection_count?: number
   review_b_rejection_count?: number
+}
+
+/** Assign payload may include comment arrays instead of per-slot counts. */
+export type WorkspaceRejectionSource = TaskRejectionCounts & {
+  comment_A?: RejectionCommentRecord[]
+  comment_B?: RejectionCommentRecord[]
+  comment_C?: RejectionCommentRecord[]
 }
 
 export function rejectionCount(value: number | null | undefined): number {
@@ -45,9 +53,13 @@ export type WorkspaceRejectionDisplay = {
   upstream: WorkspaceRejectionUpstreamItem[]
 }
 
+function commentLength(records: RejectionCommentRecord[] | undefined): number {
+  return records?.filter((record) => record.comment.trim().length > 0).length ?? 0
+}
+
 /** Role-scoped rejection summary for the workspace sidebar. */
 export function getWorkspaceRejectionDisplay(
-  task: TaskRejectionCounts,
+  task: WorkspaceRejectionSource,
   role: string | undefined
 ): WorkspaceRejectionDisplay | null {
   const normalized = normalizeUserRole(role)
@@ -61,10 +73,25 @@ export function getWorkspaceRejectionDisplay(
   if (normalized === UserRole.Reviewer) {
     const upstream: WorkspaceRejectionUpstreamItem[] = (
       [
-        { labelKey: 'diffResolver.annotator1' as const, count: task.annotation_a_rejection_count },
-        { labelKey: 'diffResolver.annotator2' as const, count: task.annotation_b_rejection_count },
-        { labelKey: 'diffResolver.annotator3' as const, count: task.annotation_c_rejection_count },
-      ] satisfies Array<{ labelKey: WorkspaceRejectionUpstreamItem['labelKey']; count: number | undefined }>
+        {
+          labelKey: 'diffResolver.annotator1' as const,
+          count:
+            task.annotation_a_rejection_count ?? commentLength(task.comment_A),
+        },
+        {
+          labelKey: 'diffResolver.annotator2' as const,
+          count:
+            task.annotation_b_rejection_count ?? commentLength(task.comment_B),
+        },
+        {
+          labelKey: 'diffResolver.annotator3' as const,
+          count:
+            task.annotation_c_rejection_count ?? commentLength(task.comment_C),
+        },
+      ] satisfies Array<{
+        labelKey: WorkspaceRejectionUpstreamItem['labelKey']
+        count: number | undefined
+      }>
     )
       .map((item) => ({ ...item, count: rejectionCount(item.count) }))
       .filter((item) => item.count > 0)

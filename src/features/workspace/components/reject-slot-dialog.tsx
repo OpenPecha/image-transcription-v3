@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Ban } from 'lucide-react'
 import {
@@ -17,7 +17,6 @@ import {
   REJECT_TARGET_ANNOTATOR_A,
   REJECT_TARGET_ANNOTATOR_B,
   REJECT_TARGET_ANNOTATOR_C,
-  REJECT_TARGET_BOTH,
   REJECT_TARGET_ALL_ANNOTATORS,
 } from '../types/reject-target'
 
@@ -33,8 +32,14 @@ type RejectSlotDialogProps = {
   onConfirm: (params: RejectConfirmParams) => void
   isLoading?: boolean
   taskName: string
-  hasAnnotatorC?: boolean
 }
+
+const REJECT_OPTIONS = [
+  { target: REJECT_TARGET_ANNOTATOR_A, labelKey: 'actions.rejectAnnotatorA' },
+  { target: REJECT_TARGET_ANNOTATOR_B, labelKey: 'actions.rejectAnnotatorB' },
+  { target: REJECT_TARGET_ANNOTATOR_C, labelKey: 'actions.rejectAnnotatorC' },
+  { target: REJECT_TARGET_ALL_ANNOTATORS, labelKey: 'actions.rejectAll' },
+] as const
 
 export function RejectSlotDialog({
   open,
@@ -43,27 +48,10 @@ export function RejectSlotDialog({
   onConfirm,
   isLoading = false,
   taskName,
-  hasAnnotatorC = false,
 }: RejectSlotDialogProps) {
   const { t } = useTranslation('workspace')
   const { t: tCommon } = useTranslation('common')
   const copyPrefix = 'dialogs.reject.choose'
-
-  const options = useMemo(() => {
-    if (hasAnnotatorC) {
-      return [
-        { target: REJECT_TARGET_ANNOTATOR_A, labelKey: 'actions.rejectAnnotatorA' },
-        { target: REJECT_TARGET_ANNOTATOR_B, labelKey: 'actions.rejectAnnotatorB' },
-        { target: REJECT_TARGET_ANNOTATOR_C, labelKey: 'actions.rejectAnnotatorC' },
-        { target: REJECT_TARGET_ALL_ANNOTATORS, labelKey: 'actions.rejectAll' },
-      ]
-    }
-    return [
-      { target: REJECT_TARGET_ANNOTATOR_A, labelKey: 'actions.rejectAnnotatorA' },
-      { target: REJECT_TARGET_ANNOTATOR_B, labelKey: 'actions.rejectAnnotatorB' },
-      { target: REJECT_TARGET_BOTH, labelKey: 'actions.rejectBoth' },
-    ]
-  }, [hasAnnotatorC])
 
   const [selectedTarget, setSelectedTarget] = useState<RejectTarget | null>(null)
   const [comment, setComment] = useState('')
@@ -110,7 +98,7 @@ export function RejectSlotDialog({
               aria-label={t(`${copyPrefix}.targetPrompt`)}
               className="flex flex-wrap gap-x-5 gap-y-3"
             >
-              {options.map(({ target, labelKey }) => (
+              {REJECT_OPTIONS.map(({ target, labelKey }) => (
                 <label
                   key={target}
                   className="flex cursor-pointer items-center gap-2 text-sm leading-none"

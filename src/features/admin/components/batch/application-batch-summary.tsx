@@ -1,6 +1,7 @@
+import { useTranslation } from 'react-i18next'
 import { Skeleton } from '@/components/ui/skeleton'
+import { getFinalizedPercentage } from './progress-bar/progress-bar.utils'
 import {
-  BATCH_STATS_CONFIG,
   WORKFLOW_STATS,
   type ApplicationBatchReport,
   type BatchStatKey,
@@ -8,7 +9,6 @@ import {
 
 const SUMMARY_STAT_KEYS: BatchStatKey[] = [...WORKFLOW_STATS, 'trashed']
 
-// Total card plus one card per state
 const SUMMARY_CARD_COUNT = SUMMARY_STAT_KEYS.length + 1
 const SUMMARY_GRID_CLASS = 'grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-7'
 
@@ -17,12 +17,19 @@ function percent(part: number, total: number): number {
   return Math.round((part / total) * 100)
 }
 
-interface ApplicationBatchSummaryProps {
+type ApplicationBatchSummaryProps = {
   report: ApplicationBatchReport | undefined
   isLoading: boolean
+  isError?: boolean
 }
 
-export function ApplicationBatchSummary({ report, isLoading }: ApplicationBatchSummaryProps) {
+export function ApplicationBatchSummary({
+  report,
+  isLoading,
+  isError = false,
+}: ApplicationBatchSummaryProps) {
+  const { t } = useTranslation('admin')
+
   if (isLoading) {
     return (
       <div className="space-y-3 pb-4">
@@ -36,13 +43,28 @@ export function ApplicationBatchSummary({ report, isLoading }: ApplicationBatchS
     )
   }
 
+  if (isError) {
+    return (
+      <p className="pb-4 text-sm text-muted-foreground">
+        {t('batches.failedToLoadStats')}
+      </p>
+    )
+  }
+
   if (!report) return null
 
   const total = report.total_tasks
+  const reviewedPercent = getFinalizedPercentage(report)
   const stats = [
-    { label: 'Total', value: total, meta: '100%' },
+    {
+      key: 'total',
+      label: t('batches.total'),
+      value: total,
+      meta: '100%',
+    },
     ...SUMMARY_STAT_KEYS.map((key) => ({
-      label: BATCH_STATS_CONFIG[key].label,
+      key,
+      label: t(`batches.states.${key}`),
       value: report[key],
       meta: `${percent(report[key], total)}%`,
     })),
@@ -50,14 +72,17 @@ export function ApplicationBatchSummary({ report, isLoading }: ApplicationBatchS
 
   return (
     <div className="space-y-3 pb-4">
-      <div className="space-y-0.5">
-        <div className="text-sm font-semibold tracking-tight capitalize">
-          {report.name}
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="text-sm font-semibold tracking-tight">
+          {t('batches.applicationSummaryTitle')}
+        </div>
+        <div className="text-sm font-medium text-muted-foreground">
+          {t('batches.finalized', { percentage: reviewedPercent })}
         </div>
       </div>
       <div className={SUMMARY_GRID_CLASS}>
         {stats.map((item) => (
-          <div key={item.label} className="rounded-lg border bg-card px-3 py-2">
+          <div key={item.key} className="rounded-lg border bg-card px-3 py-2">
             <div className="text-[11px] font-medium text-muted-foreground">{item.label}</div>
             <div className="mt-1 flex items-baseline gap-2">
               <div className="text-lg font-semibold tabular-nums leading-none">{item.value}</div>
@@ -69,4 +94,3 @@ export function ApplicationBatchSummary({ report, isLoading }: ApplicationBatchS
     </div>
   )
 }
-

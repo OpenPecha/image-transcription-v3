@@ -42,7 +42,8 @@ pending
 ## Double-blind annotation
 
 - Annotators A, B, and C must be different users.
-- Annotators B and C start from `initial_transcript`, not another annotator's
+- Annotators B and C start from baseline OCR delivered as `task_transcript`
+  (`COALESCE` of their slot and `InitialTranscript`), never another annotator's
   work.
 - Annotator A is the only slot allowed to trash a task.
 - Annotators B and C must submit their work and cannot trash.
@@ -62,8 +63,7 @@ For rejection, the reviewer submits a comment and a `reject_target`:
 | `3` | Annotator C |
 | `4` | All annotators |
 
-Legacy two-annotator batches use target `3` for both annotators. Rejection
-comments are returned as `comment_A`, `comment_B`, and `comment_C`.
+Rejection comments are returned as `comment_A`, `comment_B`, and `comment_C`.
 
 ## Workspace editor
 

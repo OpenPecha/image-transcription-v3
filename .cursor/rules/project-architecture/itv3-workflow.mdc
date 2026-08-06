@@ -36,8 +36,9 @@ Admin report buckets are `pending`, `annotated_a`, `annotated_b`, `annotated`,
 
 - Annotators A, B, and C must be different users.
 - The reviewer must not be any annotator on the task.
-- Annotators B and C receive the baseline OCR (`initial_transcript`), never a
-  previous annotator's transcript.
+- Annotators B and C receive the baseline OCR as `task_transcript`
+  (`COALESCE` of their slot and `InitialTranscript`), never a previous
+  annotator's transcript.
 - The reviewer receives the comparison of all three annotation transcripts.
 - Only the roles `annotator` and `reviewer` can be assigned workspace tasks.
   There is no Final Reviewer role or Reviewer B slot.
@@ -49,7 +50,6 @@ Admin report buckets are `pending`, `annotated_a`, `annotated_b`, `annotated`,
 - The reviewer approves only in `reviewing`; approval transitions to `reviewed`.
 - A reviewer rejection uses `submit: false`, a comment, and `reject_target`:
   `1` for A, `2` for B, `3` for C, and `4` for all annotators.
-- For legacy two-annotator batches, target `3` means both annotators.
 - Assignment payload rejection history uses `rejection_count` and
   `comment_A`, `comment_B`, and `comment_C`.
 
