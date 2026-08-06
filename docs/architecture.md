@@ -120,7 +120,7 @@ Route paths and their role requirements:
 | Path | Allowed Roles |
 |---|---|
 | `/dashboard` | All authenticated users |
-| `/workspace` | Annotator, Reviewer, Final Reviewer |
+| `/workspace` | Annotator, Reviewer |
 | `/admin/users` | Admin |
 | `/admin/groups` | Admin |
 | `/admin/batches` | Admin |

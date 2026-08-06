@@ -25,11 +25,10 @@ export type BatchExportResponse = {
 // Task state for batch task view
 export type BatchTaskState =
   | 'pending'
-  | 'half_annotated'
+  | 'annotated_a'
+  | 'annotated_b'
   | 'annotated'
-  | 'half_reviewed'
   | 'reviewed'
-  | 'finalised'
   | 'trashed'
 
 // Individual task from batch tasks endpoint
@@ -45,15 +44,13 @@ export interface BatchTask {
   annotator_a_username?: string | null
   annotator_b_username?: string | null
   annotator_c_username?: string | null
+  /** Single ITv3 reviewer username (API may still send as reviewer_a_username). */
   reviewer_a_username?: string | null
-  reviewer_b_username?: string | null
-  final_reviewer_username?: string | null
   trashed_by?: string | null
   annotation_a_rejection_count?: number
   annotation_b_rejection_count?: number
   annotation_c_rejection_count?: number
   review_a_rejection_count?: number
-  review_b_rejection_count?: number
 }
 
 // Task returned from application-wide task search
@@ -67,8 +64,6 @@ export interface BatchTaskSearchResult {
   annotator_b_username?: string | null
   annotator_c_username?: string | null
   reviewer_a_username?: string | null
-  reviewer_b_username?: string | null
-  final_reviewer_username?: string | null
   trashed_by?: string | null
   batch_id: string
   batch_name: string
@@ -77,39 +72,30 @@ export interface BatchTaskSearchResult {
   annotation_transcript_order_2: string | null
   annotation_transcript_order_3: string | null
   reviewed_transcript_order_1: string | null
-  reviewed_transcript_order_2: string | null
-  finalised_transcript: string | null
   annotation_a_rejection_count?: number
   annotation_b_rejection_count?: number
   annotation_c_rejection_count?: number
   review_a_rejection_count?: number
-  review_b_rejection_count?: number
 }
 
 export type BatchTaskParticipantRole =
   | 'annotator_a'
   | 'annotator_b'
   | 'annotator_c'
-  | 'reviewer_a'
-  | 'reviewer_b'
-  | 'final_reviewer'
+  | 'reviewer'
 
 export const BATCH_TASK_PARTICIPANT_ROLE_LABEL_KEYS = {
   annotator_a: 'annotator1',
   annotator_b: 'annotator2',
   annotator_c: 'annotator3',
-  reviewer_a: 'reviewer1',
-  reviewer_b: 'reviewer2',
-  final_reviewer: 'finalReviewer',
+  reviewer: 'reviewer',
 } as const satisfies Record<
   BatchTaskParticipantRole,
-  'annotator1' | 'annotator2' | 'annotator3' | 'reviewer1' | 'reviewer2' | 'finalReviewer'
+  'annotator1' | 'annotator2' | 'annotator3' | 'reviewer'
 >
 
 const PARTICIPANT_TRANSCRIPT_PRIORITY: BatchTaskParticipantRole[] = [
-  'final_reviewer',
-  'reviewer_b',
-  'reviewer_a',
+  'reviewer',
   'annotator_c',
   'annotator_b',
   'annotator_a',
@@ -124,9 +110,7 @@ export function getBatchTaskSearchParticipantTranscript(
     annotator_a: task.annotation_transcript_order_1,
     annotator_b: task.annotation_transcript_order_2,
     annotator_c: task.annotation_transcript_order_3,
-    reviewer_a: task.reviewed_transcript_order_1,
-    reviewer_b: task.reviewed_transcript_order_2,
-    final_reviewer: task.finalised_transcript,
+    reviewer: task.reviewed_transcript_order_1,
   }
 
   const value = transcriptByRole[role]?.trim()
@@ -158,32 +142,16 @@ export function getBatchTaskSearchTranscript(
   return task.initial_transcript?.trim() || null
 }
 
+// Per-state task counts returned by the report endpoints
+export type BatchStateCounts = Record<BatchTaskState, number>
+
 // Batch with stats from report endpoint
-export interface BatchReport extends Batch {
+export interface BatchReport extends Omit<Batch, 'group_name'>, BatchStateCounts {
   total_tasks: number
-  pending: number
-  half_annotated: number
-  annotated: number
-  half_reviewed: number
-  reviewed: number
-  finalised: number
-  trashed: number
 }
 
-export type ApplicationBatchReport = {
-  id: string
-  name: string
-  created: string
-  group_id: string
-  total_tasks: number
-  pending: number
-  half_annotated: number
-  annotated: number
-  half_reviewed: number
-  reviewed: number
-  finalised: number
-  trashed: number
-}
+// Application-wide totals across every batch, returned as a single object
+export type ApplicationBatchReport = BatchReport
 
 // Individual task in upload JSON
 export interface BatchUploadTask {
@@ -209,60 +177,52 @@ export const BATCH_STATS_CONFIG = {
     textColor: 'text-slate-700',
     order: 0,
   },
-  half_annotated: {
-    label: 'Half Annotated',
+  annotated_a: {
+    label: 'Annotated A',
     color: 'bg-sky-100 text-sky-700',
     barColor: 'bg-sky-300',
     textColor: 'text-sky-900',
     order: 1,
   },
-  annotated: {
-    label: 'Annotated',
+  annotated_b: {
+    label: 'Annotated B',
     color: 'bg-blue-100 text-blue-700',
-    barColor: 'bg-indigo-500',
+    barColor: 'bg-blue-400',
     textColor: 'text-white',
     order: 2,
   },
-  half_reviewed: {
-    label: 'Half Reviewed',
-    color: 'bg-amber-50 text-amber-700',
-    barColor: 'bg-amber-200',
-    textColor: 'text-amber-900',
+  annotated: {
+    label: 'Annotated',
+    color: 'bg-indigo-100 text-indigo-700',
+    barColor: 'bg-indigo-500',
+    textColor: 'text-white',
     order: 3,
   },
   reviewed: {
     label: 'Reviewed',
-    color: 'bg-amber-100 text-amber-700',
-    barColor: 'bg-cyan-500',
-    textColor: 'text-white',
-    order: 4,
-  },
-  finalised: {
-    label: 'Finalised',
     color: 'bg-emerald-100 text-emerald-700',
     barColor: 'bg-emerald-500',
     textColor: 'text-white',
-    order: 5,
+    order: 4,
   },
   trashed: {
     label: 'Trashed',
     color: 'bg-red-100 text-red-700',
     barColor: 'bg-rose-500',
     textColor: 'text-white',
-    order: 6,
+    order: 5,
     isHatched: true,
   },
-} as const
+} as const satisfies Record<BatchTaskState, unknown>
 
 export type BatchStatKey = keyof typeof BATCH_STATS_CONFIG
 
 // Workflow statuses (excluding trashed)
 export const WORKFLOW_STATS: BatchStatKey[] = [
   'pending',
-  'half_annotated',
+  'annotated_a',
+  'annotated_b',
   'annotated',
-  'half_reviewed',
   'reviewed',
-  'finalised',
 ]
 

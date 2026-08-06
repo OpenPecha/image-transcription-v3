@@ -12,6 +12,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
+import { AdminFeatureUnavailable } from '@/features/admin/components/admin-feature-unavailable'
+import { ADMIN_FEATURE_AVAILABILITY } from '@/features/admin/lib/admin-feature-availability'
 import { cn } from '@/lib/utils'
 import {
   formatReportCountSum,
@@ -75,6 +77,25 @@ export function UserReportDialog({ open, onOpenChange, user }: UserReportDialogP
     appliedFilters,
     open
   )
+
+  if (!ADMIN_FEATURE_AVAILABILITY.contributions) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>
+              {t('users.report.title')} - {user.username}
+            </DialogTitle>
+            <DialogDescription>{t('users.report.description')}</DialogDescription>
+          </DialogHeader>
+          <AdminFeatureUnavailable
+            title={t('featureAvailability.contributionsTitle')}
+            description={t('featureAvailability.contributionsDescription')}
+          />
+        </DialogContent>
+      </Dialog>
+    )
+  }
 
   const tasks = report?.tasks ?? []
   const roleSummary = getContributionSummaryForRole(
@@ -271,52 +292,6 @@ function ContributionsTable({ tasks, role }: ContributionsTableProps) {
     )
   }
 
-  if (role === UserRole.FinalReviewer) {
-    return (
-      <table className="w-full min-w-max text-sm">
-        <thead>
-          <tr>
-            <th className={cn(contributionTableHeadCellClass, 'text-left')}>
-              {t('users.report.table.imageName')}
-            </th>
-            <th className={cn(contributionTableHeadCellClass, 'text-left')}>
-              {t('users.report.table.batch')}
-            </th>
-            <th className={cn(contributionTableHeadCellClass, 'text-right')}>
-              {t('users.report.table.rejections')}
-            </th>
-            <th className={cn(contributionTableHeadCellClass, 'text-right')}>
-              {t('users.report.table.finalChars')}
-            </th>
-            <th className={cn(contributionTableHeadCellClass, 'text-right')}>
-              {t('users.report.table.charDiff')}
-            </th>
-            <th className={cn(contributionTableHeadCellClass, 'text-right')}>
-              {t('users.report.table.percentDiff')}
-            </th>
-            <th className={cn(contributionTableHeadCellClass, 'text-right')}>
-              {t('users.report.table.ownVersion')}
-            </th>
-            <th className={cn(contributionTableHeadCellClass, 'text-right')}>
-              {t('users.report.table.selectedOption')}
-            </th>
-            <th className={cn(contributionTableHeadCellClass, 'text-right')}>
-              {t('users.report.table.modifiedOption')}
-            </th>
-            <th className={cn(contributionTableHeadCellClass, 'text-right')}>
-              {t('users.report.table.date')}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {tasks.map((task) => (
-            <FinalReviewerContributionRow key={task.task_id} task={task} />
-          ))}
-        </tbody>
-      </table>
-    )
-  }
-
   return (
     <table className="w-full min-w-max text-sm">
       <thead>
@@ -416,7 +391,7 @@ function ReviewerContributionRow({ task, role }: ContributionRowProps) {
   const slotKey =
     task.order != null
       ? getContributionSlotLabelKey(role, task.order)
-      : 'reviewerA'
+      : 'reviewer'
 
   return (
     <tr className="border-t transition-colors hover:bg-muted/30">
@@ -466,43 +441,6 @@ function ReviewerContributionRow({ task, role }: ContributionRowProps) {
   )
 }
 
-function FinalReviewerContributionRow({ task }: { task: Itv3ContributionTask }) {
-  return (
-    <tr className="border-t transition-colors hover:bg-muted/30">
-      <td className="max-w-[220px] truncate px-4 py-2.5" title={task.name}>
-        {task.name}
-      </td>
-      <td className="px-4 py-2.5">
-        <BatchBadge name={task.batch_name} />
-      </td>
-      <td className="px-4 py-2.5 text-right font-mono text-xs">
-        <RejectionCell count={task.rejection_count} />
-      </td>
-      <td className="px-4 py-2.5 text-right font-mono text-xs">
-        {formatReportNumber(task.final_char_count)}
-      </td>
-      <td className="px-4 py-2.5 text-right font-mono text-xs">
-        {formatReportSignedNumber(task.total_char_difference)}
-      </td>
-      <td className="px-4 py-2.5 text-right font-mono text-xs">
-        {formatReportPercent(task.char_percent_diff)}
-      </td>
-      <td className="px-4 py-2.5 text-right font-mono text-xs">
-        {formatReportCountSum(task.own_version_count, task.own_version_sum)}
-      </td>
-      <td className="px-4 py-2.5 text-right font-mono text-xs">
-        {formatReportCountSum(task.selected_option_count, task.selected_option_sum)}
-      </td>
-      <td className="px-4 py-2.5 text-right font-mono text-xs">
-        {formatReportCountSum(task.modified_option_count, task.modified_option_sum)}
-      </td>
-      <td className="px-4 py-2.5 text-right text-xs text-muted-foreground">
-        {formatDateTime(task.updated_time)}
-      </td>
-    </tr>
-  )
-}
-
 function EmptyContributions() {
   const { t } = useTranslation('admin')
 
@@ -521,13 +459,7 @@ function EmptyContributions() {
 
 function ContributionsTableSkeleton({ role }: { role: UserRole | undefined }) {
   const colCount =
-    role === UserRole.Annotator
-      ? 8
-      : role === UserRole.Reviewer
-        ? 14
-        : role === UserRole.FinalReviewer
-          ? 10
-          : 3
+    role === UserRole.Annotator ? 8 : role === UserRole.Reviewer ? 14 : 3
 
   return (
     <div className="space-y-0">

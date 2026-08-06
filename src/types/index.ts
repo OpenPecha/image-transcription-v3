@@ -12,7 +12,6 @@ export type {
   Itv3AnnotatorContributionSummary,
   Itv3ContributionSummary,
   Itv3ContributionTask,
-  Itv3FinalReviewerContributionSummary,
   Itv3ReviewerContributionSummary,
   UserContributionReportResponse,
 } from './user-contribution-report'
@@ -20,7 +19,6 @@ export type {
 export type {
   AnnotatorContributionRow,
   ContributionSummaryQueryParams,
-  FinalReviewerContributionRow,
   GroupContributionSummaryResponse,
   ReviewerContributionRow,
 } from './contributions'
@@ -33,14 +31,12 @@ export {
   VALID_TRANSITIONS,
   ITV3_EDITABLE_TASK_STATES,
   ITV3_REVIEWER_APPROVABLE_STATES,
-  ITV3_FINAL_REVIEWER_APPROVABLE_STATES,
   isEditableTaskState,
   isAnnotatorATaskState,
   isAnnotatorBTaskState,
   isAnnotatorCTaskState,
+  isReviewerTaskState,
   isReviewerATaskState,
-  isReviewerBTaskState,
-  isTaskAtOrPastFinalReview,
   canAnnotatorTrashTask,
   getAnnotatorBaselineTranscript,
 } from './task'

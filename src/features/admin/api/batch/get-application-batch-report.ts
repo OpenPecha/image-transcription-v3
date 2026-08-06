@@ -5,7 +5,7 @@ import { batchKeys } from './batch-keys'
 
 const getApplicationBatchReport = async (
   applicationName: string
-): Promise<ApplicationBatchReport[]> => {
+): Promise<ApplicationBatchReport> => {
   return apiClient.get(`/batch/application/${applicationName}/reports`)
 }
 

@@ -65,8 +65,8 @@
         "slots": {
           "annotatorA": "ཡིག་འགྲིག་པ་ ཀ",
           "annotatorB": "ཡིག་འགྲིག་པ་ ཁ",
-          "reviewerA": "ཞིབ་བཤེར་པ་ ཀ",
-          "reviewerB": "ཞིབ་བཤེར་པ་ ཁ"
+          "annotatorC": "ཡིག་འགྲིག་པ་ ག",
+          "reviewer": "ཞིབ་བཤེར་པ།"
         }
       },
       "noContributions": "བྱས་རྗེས་མ་རྙེད།",
@@ -75,7 +75,7 @@
   },
   "userContributions": {
     "title": "སྡེ་ཚན་བྱས་རྗེས།",
-    "description": "ཁྱེད་ཀྱི་སྡེ་ཚན་གྱི་ཟིན་བྲིས་པ། ཞིབ་བཤེར་པ། མཇུག་དམ་ཞིབ་བཤེར་པའི་བྱས་རྗེས་ལྟ།",
+    "description": "ཁྱེད་ཀྱི་སྡེ་ཚན་གྱི་ཟིན་བྲིས་པ་དང་ཞིབ་བཤེར་པའི་བྱས་རྗེས་ལྟ།",
     "noGroupYet": "ཁྱེད་སྡེ་ཚན་གང་ཡང་མེད།",
     "refresh": "གསར་བཅོས།",
     "groupsLoadError": "སྡེ་ཚན་ཕབ་ལོད་མ་ཐུབ། ཡང་བསྐྱར་ཚོད་ལྟ།",
@@ -92,10 +92,8 @@
     "adminExpandHint": "སྡེ་ཚན་རྒྱ་སྤེལ་ནས་ཟླ་བ་འདིའི་བྱས་རྗེས་ལྟ། ཚེས་གྲངས་བསྒྱུར་ནས་སྤྱོད།",
     "annotatorsSection": "ཟིན་བྲིས་པ།",
     "reviewersSection": "ཞིབ་བཤེར་པ།",
-    "finalReviewersSection": "མཇུག་དམ་ཞིབ་བཤེར་པ།",
     "noAnnotators": "ཟླ་བ་འདིར་ཟིན་བྲིས་པའི་གྲངས་མེད།",
     "noReviewers": "ཟླ་བ་འདིར་ཞིབ་བཤེར་པའི་གྲངས་མེད།",
-    "noFinalReviewers": "ཟླ་བ་འདིར་མཇུག་དམ་ཞིབ་བཤེར་པའི་གྲངས་མེད།",
     "tables": {
       "annotator": {
         "username": "མིང་།",
@@ -124,19 +122,6 @@
         "charPercentDiff": "བརྒྱ་ཆ་འགྱུར།",
         "rejectionsMade": "ཕྱིར་སློག་བྱས་པ།",
         "rejectionsMadePercent": "ཕྱིར་སློག་བྱས་ཚད།",
-        "ownVersion": "རང་ཐོག",
-        "selectedOption": "བདམས་པ།",
-        "modifiedOption": "བཅོས་པ།"
-      },
-      "finalReviewer": {
-        "username": "མིང་།",
-        "tasksFinalised": "མཇུག་བསྒྲིལ་བསྒྲུབས།",
-        "rejectionsMade": "ཕྱིར་སློག་བྱས་པ།",
-        "rejectionsMadePercent": "ཕྱིར་སློག་བྱས་ཚད།",
-        "unrejectedPercent": "ཕྱིར་མ་སློག་ཚད།",
-        "finalCharCount": "མཇུག་ཡི་གེ།",
-        "charDiff": "ཡི་གེ་འགྱུར།",
-        "charPercentDiff": "བརྒྱ་ཆ་འགྱུར།",
         "ownVersion": "རང་ཐོག",
         "selectedOption": "བདམས་པ།",
         "modifiedOption": "བཅོས་པ།"
@@ -188,8 +173,11 @@
     "task": "ལས་ཀ་ {{count}}",
     "failedToLoadStats": "ཚོ་སྒྲིག་སྡོམ་རྩིས་སྣོན་མ་ཐུབ།",
     "noTasksInBatch": "ཚོ་སྒྲིག་འདིར་ལས་ཀ་མེད།",
+    "individualBatches": "སོ་སོའི་ཚོ་སྒྲིག",
+    "applicationSummaryTitle": "ཚོ་སྒྲིག་ཚང་མའི་སྡོམ་རྩིས།",
+    "total": "བསྡོམས།",
     "status": "གནས་སྟངས།",
-    "finalized": "མཇུག་བསྒྲིལ། {{percentage}}%",
+    "finalized": "ཞིབ་བཤེར་ཟིན། {{percentage}}%",
     "trashed": "བསུབས། {{count}}",
     "viewTasks": "ལས་ཀ་ལྟ།",
     "batchTasks": "ཚོ་སྒྲིག་ལས་ཀ།",
@@ -213,9 +201,7 @@
       "annotator1": "ཡིག་འགྲིག་པ་ ཀ",
       "annotator2": "ཡིག་འགྲིག་པ་ ཁ",
       "annotator3": "ཡིག་འགྲིག་པ་ ག",
-      "reviewer1": "ཞིབ་བཤེར་པ་ ཀ",
-      "reviewer2": "ཞིབ་བཤེར་པ་ ཁ",
-      "finalReviewer": "མཇུག་དམ་བཤེར་པ།"
+      "reviewer": "ཞིབ་བཤེར་པ།"
     },
     "filterByState": "གནས་སྟངས་ཀྱིས་ཚགས།",
     "downloadCsv": "CSV ཕབ་ལེན།",
@@ -229,11 +215,10 @@
     "states": {
       "all": "ཚང་མ།",
       "pending": "སྒུག་བཞིན།",
-      "half_annotated": "མཆན་བཀོད་ཕྱེད་ཀ",
+      "annotated_a": "མཆན་བཀོད་ ཀ",
+      "annotated_b": "མཆན་བཀོད་ ཁ",
       "annotated": "མཆན་བཀོད།",
-      "half_reviewed": "བསྐྱར་ཞིབ་ཕྱེད་ཀ",
       "reviewed": "བསྐྱར་ཞིབ་བྱས།",
-      "finalised": "མཇུག་བསྒྲིལ།",
       "trashed": "བསུབས།"
     },
     "upload": {
@@ -257,6 +242,14 @@
       "failed": "འགེལ་བ་མི་ཐུབ།",
       "failedDescription": "ཚོ་སྒྲིག་འགེལ་མ་ཐུབ། ཡང་བསྐྱར་ཚོད་ལྟ།"
     }
+  },
+  "featureAvailability": {
+    "batchTasksTitle": "ཚོ་སྒྲིག་གི་ལས་ཀ་ད་ལྟ་སྤྱོད་མི་ཐུབ།",
+    "batchTasksDescription": "Image Transcription V3 ཞབས་ཞུས་ཚོ་སྒྲིག་ལས་ཀའི་ཐོ་དང་ CSV ཕྱིར་འདྲེན་ད་དུང་མ་བཟོས། ཚོ་སྒྲིག་སྙན་ཐོ་སྤྱོད་ཐུབ།",
+    "batchExportUnavailable": "Image Transcription V3 ལ་ CSV ཕྱིར་འདྲེན་ད་ལྟ་སྤྱོད་མི་ཐུབ།",
+    "batchTaskSearchUnavailable": "Image Transcription V3 ལ་ལས་ཀ་འཚོལ་བ་ད་ལྟ་སྤྱོད་མི་ཐུབ།",
+    "contributionsTitle": "བྱས་རྗེས་སྙན་ཐོ་ད་ལྟ་སྤྱོད་མི་ཐུབ།",
+    "contributionsDescription": "Image Transcription V3 ཞབས་ཞུས་སྤྱོད་མཁན་དང་སྡེ་ཚན་གྱི་བྱས་རྗེས་སྙན་ཐོ་ད་དུང་མ་བཟོས།"
   },
   "common": {
     "cancel": "དོར།",

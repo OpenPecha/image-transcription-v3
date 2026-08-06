@@ -6,7 +6,6 @@ import { WorkspaceSidebar } from './workspace-sidebar'
 import { TrashConfirmationDialog } from './trash-confirmation-dialog'
 import { TaskConfirmationDialog } from './task-confirmation-dialog'
 import { RejectAnnotatorDialog } from './reject-annotator-dialog'
-import { RejectReviewerDialog } from './reject-reviewer-dialog'
 import { RejectAnnotatorBar } from './reject-annotator-bar'
 import { EditorOverlay } from './editor-overlay'
 import { EditorToolbar } from './editor-toolbar'
@@ -43,14 +42,13 @@ import {
   useTrashTask,
   useApproveTask,
 } from '../api'
-import { loadNonEmptyTextDraft, useLocalDraft, useRejectAnnotatorFlow, useRejectReviewerFlow } from '../hooks'
+import { loadNonEmptyTextDraft, useLocalDraft, useRejectAnnotatorFlow } from '../hooks'
 import {
   getWorkspaceRoleCaps,
   isAnnotatorRole,
   isApprovableTaskState,
   isWorkspaceEditable,
   canReviewerRejectAnnotators,
-  canFinalReviewerRejectReviewers,
 } from '../workspace-role-config'
 import { cn } from '@/lib/utils'
 import {
@@ -109,7 +107,6 @@ export function WorkspaceEditor() {
   const roleCaps = getWorkspaceRoleCaps(currentUser?.role)
   const isAnnotator = isAnnotatorRole(currentUser?.role)
   const dictionaryEnabled = roleCaps?.dictionaryEnabled ?? false
-  const usesReviewerTranscript = roleCaps?.usesReviewerTranscript ?? false
   const usesApproveAction = roleCaps?.usesApproveAction ?? false
   const canTrash = isAnnotator && task ? canAnnotatorTrashTask(task.state) : false
   const usesDiffResolver = roleCaps?.usesDiffResolver ?? false
@@ -138,21 +135,11 @@ export function WorkspaceEditor() {
   const canEdit = task ? isWorkspaceEditable(task.state, currentUser?.role) : false
   const canRejectAnnotators =
     !!task && canReviewerRejectAnnotators(task.state, currentUser?.role) && canEdit
-  const canRejectReviewers =
-    !!task && canFinalReviewerRejectReviewers(task.state, currentUser?.role) && canEdit
 
   const rejectAnnotatorFlow = useRejectAnnotatorFlow({
     task,
     userId: currentUser?.id,
     enabled: canRejectAnnotators,
-    clearDrafts: clearAllDrafts,
-    addToast,
-  })
-
-  const rejectReviewerFlow = useRejectReviewerFlow({
-    task,
-    userId: currentUser?.id,
-    enabled: canRejectReviewers,
     clearDrafts: clearAllDrafts,
     addToast,
   })
@@ -166,18 +153,29 @@ export function WorkspaceEditor() {
     submitTask.isPending ||
     trashTask.isPending ||
     approveTask.isPending ||
-    rejectAnnotatorFlow.isRejecting ||
-    rejectReviewerFlow.isRejecting
+    rejectAnnotatorFlow.isRejecting
   const isLoadingNextTask = isFetching && !isLoading
   const showOverlay = isLoadingNextTask || isMutating
 
+  const transcriptForSubmit = usesDiffResolver ? resolvedText : text
+  const canSubmitTranscript = canEdit && transcriptForSubmit.trim().length > 0
+
   const canApprove = useMemo(() => {
     if (!usesApproveAction || !canActOnTask || isMutating) return false
+    if (!transcriptForSubmit.trim()) return false
+    if (usesDiffResolver && !baseTranscript.trim()) return false
     if (!usesDiffResolver || !hasDiffSegments) return true
     return allDiffsResolved(segments)
-  }, [usesApproveAction, canActOnTask, isMutating, usesDiffResolver, hasDiffSegments, segments])
-
-  const transcriptForSubmit = usesDiffResolver ? resolvedText : text
+  }, [
+    usesApproveAction,
+    canActOnTask,
+    isMutating,
+    transcriptForSubmit,
+    baseTranscript,
+    usesDiffResolver,
+    hasDiffSegments,
+    segments,
+  ])
 
   // Sync editor state when the assigned task changes
   useEffect(() => {
@@ -188,12 +186,12 @@ export function WorkspaceEditor() {
       return
     }
 
-    const transcript = usesReviewerTranscript
+    const transcript = usesDiffResolver
       ? (task.task_transcript ?? '')
       : getAnnotatorBaselineTranscript(task)
 
     const parsed = parseTDiff(transcript)
-    const usesResolver = roleCaps?.usesDiffResolver ?? false
+    const usesResolver = usesDiffResolver
 
     let nextSegments = parsed
     if (usesResolver) {
@@ -215,8 +213,6 @@ export function WorkspaceEditor() {
 
     if (usesResolver) {
       setText(resolveSegmentsPreview(nextSegments))
-    } else if (usesReviewerTranscript) {
-      setText(transcript)
     } else {
       const draft = loadNonEmptyTextDraft(task.task_id)
       setText(draft ?? transcript)
@@ -224,11 +220,8 @@ export function WorkspaceEditor() {
   }, [
     task?.task_id,
     task?.task_transcript,
-    task?.initial_transcript,
-    task?.reviewer_transcript,
     task?.state,
-    usesReviewerTranscript,
-    roleCaps?.usesDiffResolver,
+    usesDiffResolver,
   ])
 
   // Reset split position when image orientation changes
@@ -544,13 +537,13 @@ export function WorkspaceEditor() {
                 referenceTranscript1={task.task_transcript_1 ?? ''}
                 referenceTranscript2={task.task_transcript_2 ?? ''}
                 referenceTranscript3={task.task_transcript_3 ?? ''}
+                reviewerTranscript={task.reviewer_transcript ?? ''}
                 comparisonTranscript={baseTranscript}
                 fontFamily={editorFontFamily}
                 fontSize={editorFontSize}
                 noAnnotatorDiffs={!hasAnnotatorDiffs}
                 isEmptyTranscript={!baseTranscript.trim()}
                 referenceTabs={roleCaps?.referenceTabs ?? 'none'}
-                reviewerTranscript={task.reviewer_transcript ?? ''}
                 menuBoundaryRef={textPanelRef}
                 toolbar={
                   <EditorToolbar
@@ -613,7 +606,7 @@ export function WorkspaceEditor() {
                 <Button
                   variant="success"
                   onClick={() => setSubmitDialogOpen(true)}
-                  disabled={showOverlay || !canEdit}
+                  disabled={showOverlay || !canSubmitTranscript}
                 >
                   <Send className="h-4 w-4 mr-2" />
                   {submitTask.isPending ? t('actions.submitting') : t('actions.submit')}
@@ -634,13 +627,6 @@ export function WorkspaceEditor() {
             {canRejectAnnotators && (
               <RejectAnnotatorBar
                 onOpen={rejectAnnotatorFlow.openRejectDialog}
-                disabled={showOverlay}
-              />
-            )}
-
-            {canRejectReviewers && (
-              <RejectAnnotatorBar
-                onOpen={rejectReviewerFlow.openRejectDialog}
                 disabled={showOverlay}
               />
             )}
@@ -671,7 +657,6 @@ export function WorkspaceEditor() {
       />
 
       <RejectAnnotatorDialog {...rejectAnnotatorFlow.dialogProps} />
-      <RejectReviewerDialog {...rejectReviewerFlow.dialogProps} />
 
       <TaskConfirmationDialog
         open={submitDialogOpen}

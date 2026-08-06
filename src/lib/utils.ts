@@ -22,7 +22,6 @@ const ROLE_TRANSLATION_KEYS: Record<UserRole, string> = {
   [UserRole.Admin]: 'admin',
   [UserRole.Annotator]: 'annotator',
   [UserRole.Reviewer]: 'reviewer',
-  [UserRole.FinalReviewer]: 'finalReviewer',
 }
 
 export function getRoleTranslationKey(role: UserRole): string {

@@ -1,136 +1,91 @@
-# Workflows
+# Image Transcription V3 Workflows
 
-## User Roles
+The frontend uses the `imagetranscriptionv3` backend workflow: three
+double-blind annotators followed by one reviewer.
 
-TextAlign has four roles. Each role has a distinct set of permissions and a dedicated dashboard view.
+## User roles
 
 | Role | Slug | Responsibilities |
 |---|---|---|
-| **Admin** | `admin` | Manages users, groups, and batches. Does not participate in transcription. |
-| **Annotator** | `annotator` | Receives tasks with noisy/OCR text. Corrects the text against the source image and submits for review. |
-| **Reviewer** | `reviewer` | Reviews submitted corrections. Can approve (advancing to Final Review) or reject (sending back to the Annotator). |
-| **Final Reviewer** | `final reviewer` | Performs the last quality check. Approval marks a task as Gold Standard (`Completed`). Rejection sends it back to the Annotator. |
+| Admin | `admin` | Manages users, groups, and batches. |
+| Annotator | `annotator` | Corrects baseline OCR text in one of three annotation slots. |
+| Reviewer | `reviewer` | Resolves the three annotations, then approves or rejects the task. |
 
-A new user who logs in without a role is shown the **Pending Approval** screen and cannot access any features until an Admin assigns them a role.
+Users without a role remain on the Pending Approval page until an admin assigns
+one. A reviewer cannot review a task they annotated.
 
-## Task State Machine
+## Task state machine
 
-Each task moves through a strict sequence of states. The diagram below shows all valid transitions.
-
-```
-                ┌──────────┐
-                │  Pending  │
-                └────┬──────┘
-                     │ (admin assigns / annotator claims)
-                     ▼
-               ┌────────────┐
-               │ InProgress │◄─────────────────────────────────┐
-               └─────┬──────┘                                  │
-                     │ (annotator submits)                      │
-                     ▼                                          │
-           ┌──────────────────┐                                 │
-           │  AwaitingReview  │                                 │
-           └────────┬─────────┘                                 │
-                    │ (reviewer claims)                          │
-                    ▼                                            │
-              ┌──────────┐                                       │
-              │ InReview  │                                      │
-              └──┬────┬───┘                                      │
-      (approve)  │    │ (reject)                                 │
-                 │    ▼                                          │
-                 │  ┌──────────┐                                 │
-                 │  │ Rejected │─────────────────────────────────┘
-                 │  └──────────┘  (re-assigned to annotator)
-                 ▼
-  ┌────────────────────────┐
-  │  AwaitingFinalReview   │
-  └───────────┬────────────┘
-              │ (final reviewer claims)
-              ▼
-       ┌─────────────┐
-       │ FinalReview │
-       └──┬──────┬───┘
-(approve) │      │ (reject)
-          │      ▼
-          │   ┌──────────┐
-          │   │ Rejected │──► InProgress (re-assigned to annotator)
-          │   └──────────┘
-          ▼
-     ┌───────────┐
-     │ Completed │  ← Gold Standard
-     └───────────┘
+```text
+pending
+  -> annotating -> annotated_a
+  -> annotating_b -> annotated_b
+  -> annotating_c -> annotated
+  -> reviewing -> reviewed
 ```
 
-### State Reference
+`reviewed` is the terminal completed state. `trashed` is also terminal.
 
 | State | Meaning |
 |---|---|
-| `pending` | Task created, not yet assigned |
-| `in_progress` | Assigned to an Annotator, being corrected |
-| `awaiting_review` | Annotator submitted, waiting for a Reviewer to claim |
-| `in_review` | Reviewer has claimed and is reviewing |
-| `awaiting_final_review` | Reviewer approved, waiting for a Final Reviewer to claim |
-| `final_review` | Final Reviewer has claimed and is reviewing |
-| `completed` | Final Reviewer approved — Gold Standard |
-| `rejected` | Rejected by Reviewer or Final Reviewer, re-queued for Annotator |
+| `pending` | Waiting for Annotator A |
+| `annotating` | Annotator A is editing |
+| `annotated_a` | Annotator A submitted |
+| `annotating_b` | Annotator B is editing |
+| `annotated_b` | Annotator B submitted |
+| `annotating_c` | Annotator C is editing |
+| `annotated` | All annotators submitted; waiting for review |
+| `reviewing` | The reviewer is resolving the annotations |
+| `reviewed` | Review approved and complete |
+| `trashed` | Annotator A rejected an unusable task |
 
-### Rejection Flow
+## Double-blind annotation
 
-When a task is rejected (at either review tier), it transitions back to `rejected` and is then re-assigned to its original Annotator as `in_progress`. The rejection comment and actor are recorded in the task's audit history. The Annotator can see the rejection reason in the workspace sidebar before making corrections.
+- Annotators A, B, and C must be different users.
+- Annotators B and C start from baseline OCR delivered as `task_transcript`
+  (`COALESCE` of their slot and `InitialTranscript`), never another annotator's
+  work.
+- Annotator A is the only slot allowed to trash a task.
+- Annotators B and C must submit their work and cannot trash.
+- The reviewer receives the generated comparison of all three annotations.
 
-Each task tracks independent counters for annotation rejections and review rejections, surfaced in the Admin batch view.
+## Review and rejection
 
-## Task Actions (Audit Trail)
+The reviewer may approve only while the task is in `reviewing`. Approval moves
+the task to `reviewed`.
 
-Every state change is recorded as an immutable history entry. Actions available:
+For rejection, the reviewer submits a comment and a `reject_target`:
 
-| Action | Triggered by |
+| Target | Recipient |
 |---|---|
-| `created` | Admin uploads batch |
-| `assigned` | Admin or system assigns task |
-| `started` | Annotator opens task |
-| `submitted` | Annotator submits corrected text |
-| `claimed_for_review` | Reviewer picks up task |
-| `approved` | Reviewer approves |
-| `rejected` | Reviewer rejects |
-| `claimed_for_final_review` | Final Reviewer picks up task |
-| `final_approved` | Final Reviewer approves |
-| `final_rejected` | Final Reviewer rejects |
-| `reassigned` | Admin reassigns task manually |
-| `text_updated` | Annotator saves a draft |
+| `1` | Annotator A |
+| `2` | Annotator B |
+| `3` | Annotator C |
+| `4` | All annotators |
 
-## Workspace Editor
+Rejection comments are returned as `comment_A`, `comment_B`, and `comment_C`.
 
-The workspace is the primary working view for Annotators, Reviewers, and Final Reviewers.
+## Workspace editor
 
-**Layout**: The image viewer occupies the left panel; the text editor occupies the right. A sidebar shows task metadata, history, and navigation.
+The workspace is available to Annotators and Reviewers. It contains:
 
-**Image Viewer**:
-- Pan and zoom with mouse or trackpad
-- TIFF files are supported (decoded in-browser via `utif2`)
-- Keyboard shortcuts: `Ctrl/Cmd + +/-/0`
+- an image viewer with pan, zoom, and TIFF support;
+- a configurable Tibetan text editor;
+- local draft saving;
+- state- and role-gated submit, approve, reject, and trash actions;
+- task metadata and rejection history.
 
-**Text Editor**:
-- Font family and size are configurable per user (persisted in localStorage)
-- Drafts auto-saved with `Ctrl/Cmd + S`
-- Submit and Approve/Reject actions are in the toolbar
+## Admin workflows
 
-## Admin Workflows
+### Batch upload and reports
 
-### Batch Upload
+Admins upload task files and assign batches to groups. New tasks enter
+`pending`. Batch reports summarize `pending`, `annotated_a`, `annotated_b`,
+`annotated`, `reviewed`, and `trashed`; completion percentage uses `reviewed`.
 
-1. Go to **Admin → Batches → Create Batch**.
-2. Upload a CSV or JSON file containing task entries (`name`, `url`, `transcript`).
-3. Assign the batch to a **Group**.
-4. Tasks are created in bulk and enter the `pending` state.
+### Temporarily unavailable V3 features
 
-### User Management
-
-1. Go to **Admin → Users**.
-2. Create a user by email — they receive an Auth0 invitation.
-3. Assign a **Role** and a **Group** (optional).
-4. Users can be updated or removed at any time.
-
-### Group Management
-
-Groups organize users and batches together. A user belongs to one group; a batch is assigned to one group. This allows admins to scope work to specific teams.
+The backend does not yet implement batch task listing, batch CSV export, or
+user/group contribution reports for `imagetranscriptionv3`. Their admin
+surfaces show an unavailable notice instead of calling V2-only endpoints.
+Batch task restore remains wired for use after listing support is added.

@@ -23,7 +23,10 @@ export function StackedProgressBar({ report, className }: StackedProgressBarProp
     return () => cancelAnimationFrame(timer)
   }, [])
 
-  const segments = buildAllSegments(report)
+  const segments = buildAllSegments(report).map((segment) => ({
+    ...segment,
+    label: t(`batches.states.${segment.status}`),
+  }))
 
   if (segments.length === 0) {
     return (

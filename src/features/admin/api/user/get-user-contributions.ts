@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { ADMIN_FEATURE_AVAILABILITY } from '@/features/admin/lib/admin-feature-availability'
 import { apiClient } from '@/lib/axios'
 import { APPLICATION_NAME } from '@/lib/constant'
 import { emptyContributionReport } from '@/lib/user-contribution-report'
@@ -26,7 +27,6 @@ const getUserContributions = async (
     contribution_summary: response.contribution_summary ?? {
       annotator: null,
       reviewer: null,
-      final_reviewer: null,
     },
   }
 }
@@ -41,6 +41,11 @@ export const useGetUserContributions = (
     queryFn: () => getUserContributions(userId, filters),
     staleTime: 1000 * 60 * 2,
     retry: 1,
-    enabled: enabled && !!userId && !!filters.start_date && !!filters.end_date,
+    enabled:
+      ADMIN_FEATURE_AVAILABILITY.contributions &&
+      enabled &&
+      !!userId &&
+      !!filters.start_date &&
+      !!filters.end_date,
   })
 }

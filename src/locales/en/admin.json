@@ -65,8 +65,8 @@
         "slots": {
           "annotatorA": "Annotator A",
           "annotatorB": "Annotator B",
-          "reviewerA": "Reviewer A",
-          "reviewerB": "Reviewer B"
+          "annotatorC": "Annotator C",
+          "reviewer": "Reviewer"
         }
       },
       "noContributions": "No contributions found",
@@ -75,7 +75,7 @@
   },
   "userContributions": {
     "title": "Group Contributions",
-    "description": "View annotator, reviewer, and final reviewer contribution totals for your group.",
+    "description": "View annotator and reviewer contribution totals for your group.",
     "noGroupYet": "You don't belong to any group yet.",
     "refresh": "Refresh",
     "groupsLoadError": "Could not load groups. Please try again.",
@@ -92,10 +92,8 @@
     "adminExpandHint": "Expand a group to load contribution totals for the current month. Change the date range and apply to refresh. Each group keeps its own filter.",
     "annotatorsSection": "Annotators",
     "reviewersSection": "Reviewers",
-    "finalReviewersSection": "Final Reviewers",
     "noAnnotators": "No annotator data for this period.",
     "noReviewers": "No reviewer data for this period.",
-    "noFinalReviewers": "No final reviewer data for this period.",
     "tables": {
       "annotator": {
         "username": "Username",
@@ -124,19 +122,6 @@
         "charPercentDiff": "% diff",
         "rejectionsMade": "Rejections made",
         "rejectionsMadePercent": "Rejections made %",
-        "ownVersion": "Own version",
-        "selectedOption": "Selected option",
-        "modifiedOption": "Modified option"
-      },
-      "finalReviewer": {
-        "username": "Username",
-        "tasksFinalised": "Tasks finalised",
-        "rejectionsMade": "Rejections made",
-        "rejectionsMadePercent": "Rejections made %",
-        "unrejectedPercent": "Unrejected %",
-        "finalCharCount": "Final chars",
-        "charDiff": "Char diff",
-        "charPercentDiff": "% diff",
         "ownVersion": "Own version",
         "selectedOption": "Selected option",
         "modifiedOption": "Modified option"
@@ -188,8 +173,11 @@
     "task": "{{count}} task",
     "failedToLoadStats": "Failed to load batch statistics",
     "noTasksInBatch": "No tasks in this batch",
+    "individualBatches": "Individual Batches",
+    "applicationSummaryTitle": "All batches summary",
+    "total": "Total",
     "status": "Status",
-    "finalized": "{{percentage}}% Finalized",
+    "finalized": "{{percentage}}% Reviewed",
     "trashed": "{{count}} Trashed",
     "viewTasks": "View Tasks",
     "batchTasks": "Batch Tasks",
@@ -213,9 +201,7 @@
       "annotator1": "Annotator A",
       "annotator2": "Annotator B",
       "annotator3": "Annotator C",
-      "reviewer1": "Reviewer A",
-      "reviewer2": "Reviewer B",
-      "finalReviewer": "Final Reviewer"
+      "reviewer": "Reviewer"
     },
     "filterByState": "Filter by state",
     "downloadCsv": "Download CSV",
@@ -229,11 +215,10 @@
     "states": {
       "all": "All",
       "pending": "Pending",
-      "half_annotated": "Half Annotated",
+      "annotated_a": "Annotated A",
+      "annotated_b": "Annotated B",
       "annotated": "Annotated",
-      "half_reviewed": "Half Reviewed",
       "reviewed": "Reviewed",
-      "finalised": "Finalised",
       "trashed": "Trashed"
     },
     "upload": {
@@ -257,6 +242,14 @@
       "failed": "Upload failed",
       "failedDescription": "Failed to upload batch. Please try again."
     }
+  },
+  "featureAvailability": {
+    "batchTasksTitle": "Batch tasks are not available yet",
+    "batchTasksDescription": "Task listing and CSV export are not implemented by the Image Transcription V3 backend yet. Batch reports remain available.",
+    "batchExportUnavailable": "CSV export is not available for Image Transcription V3 yet",
+    "batchTaskSearchUnavailable": "Task search is not available for Image Transcription V3 yet.",
+    "contributionsTitle": "Contribution reports are not available yet",
+    "contributionsDescription": "User and group contribution reports are not implemented by the Image Transcription V3 backend yet."
   },
   "common": {
     "cancel": "Cancel",

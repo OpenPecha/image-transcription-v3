@@ -42,12 +42,14 @@ export function TaskCard({ task, onContinue }: TaskCardProps) {
               fileName={task.task_name}
               textClassName="font-semibold text-foreground"
             />
-            <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
-              <span className="flex items-center gap-1.5">
-                <Layers className="h-4 w-4" />
-                {task.batch_name}
-              </span>
-            </div>
+            {task.batch_id && (
+              <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
+                <span className="flex items-center gap-1.5">
+                  <Layers className="h-4 w-4" />
+                  {task.batch_id}
+                </span>
+              </div>
+            )}
           </div>
         </div>
       </CardHeader>

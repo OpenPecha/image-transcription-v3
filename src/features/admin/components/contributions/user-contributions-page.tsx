@@ -1,7 +1,9 @@
 import { useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSearchParams } from 'react-router-dom'
+import { LoadingSpinner } from '@/components/common'
 import { useGetGroups } from '@/features/admin/api/group'
+import { ADMIN_FEATURE_AVAILABILITY } from '@/features/admin/lib/admin-feature-availability'
 import {
   decodeAdminPeriodsParam,
   encodeAdminPeriodsMap,
@@ -10,8 +12,9 @@ import {
   USER_CONTRIB_ADMIN_EXPAND,
   USER_CONTRIB_ADMIN_PERIODS,
 } from '@/lib/user-contributions-url'
-import { LoadingSpinner } from '@/components/common'
+import { AdminFeatureUnavailable } from '../admin-feature-unavailable'
 import { AdminGroupContributionRow } from './admin-group-contribution-row'
+
 export function UserContributionsPage() {
   const { t } = useTranslation('admin')
 
@@ -22,7 +25,14 @@ export function UserContributionsPage() {
         <p className="text-muted-foreground">{t('userContributions.description')}</p>
       </div>
 
-      <AdminContributionsBody />
+      {ADMIN_FEATURE_AVAILABILITY.contributions ? (
+        <AdminContributionsBody />
+      ) : (
+        <AdminFeatureUnavailable
+          title={t('featureAvailability.contributionsTitle')}
+          description={t('featureAvailability.contributionsDescription')}
+        />
+      )}
     </div>
   )
 }

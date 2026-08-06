@@ -1,0 +1,73 @@
+---
+description: Image Transcription V3 workflow, roles, states, and API constraints
+alwaysApply: true
+---
+
+# Image Transcription V3 Workflow
+
+The API application name is **`imagetranscriptionv3`**. The workflow uses three
+double-blind annotators and one reviewer. The terminal completed state is
+**`reviewed`**.
+
+## State flow
+
+```text
+pending
+  -> annotating -> annotated_a
+  -> annotating_b -> annotated_b
+  -> annotating_c -> annotated
+  -> reviewing -> reviewed
+```
+
+`trashed` is terminal and can only be reached by Annotator A from `annotating`.
+
+| Slot | Active state | Required base state | Submit state | Transcript |
+|---|---|---|---|---|
+| Annotator A | `annotating` | `pending` | `annotated_a` | annotation order 1 |
+| Annotator B | `annotating_b` | `annotated_a` | `annotated_b` | annotation order 2 |
+| Annotator C | `annotating_c` | `annotated_b` | `annotated` | annotation order 3 |
+| Reviewer | `reviewing` | `annotated` | `reviewed` | reviewed transcript order 1 |
+
+Admin report buckets are `pending`, `annotated_a`, `annotated_b`, `annotated`,
+`reviewed`, and `trashed`. Do not introduce V2 states such as `half_annotated`,
+`half_reviewed`, `reviewing_b`, `finalising`, or `finalised`.
+
+## Eligibility and transcript isolation
+
+- Annotators A, B, and C must be different users.
+- The reviewer must not be any annotator on the task.
+- Annotators B and C receive the baseline OCR as `task_transcript`
+  (`COALESCE` of their slot and `InitialTranscript`), never a previous
+  annotator's transcript.
+- The reviewer receives the comparison of all three annotation transcripts.
+- Only the roles `annotator` and `reviewer` can be assigned workspace tasks.
+  There is no Final Reviewer role or Reviewer B slot.
+
+## Submission, rejection, and trash
+
+- Annotators submit their own slot with `submit: true`.
+- Annotator A may trash with `submit: false`; Annotators B and C may not.
+- The reviewer approves only in `reviewing`; approval transitions to `reviewed`.
+- A reviewer rejection uses `submit: false`, a comment, and `reject_target`:
+  `1` for A, `2` for B, `3` for C, and `4` for all annotators.
+- Assignment payload rejection history uses `rejection_count` and
+  `comment_A`, `comment_B`, and `comment_C`.
+
+## Current backend limitations
+
+The V3 backend does not yet implement:
+
+- batch task listing;
+- batch CSV export;
+- user or group contribution reports.
+
+Soft-gate these admin surfaces and do not call their V2-only endpoints.
+Batch reports and task restore are implemented; keep restore wired for when
+batch task listing becomes available.
+
+## Frontend API rules
+
+- Use TanStack Query for all API reads and mutations.
+- Gate role actions by the active V3 state, not only by the user's role.
+- Treat `reviewed` as terminal completion in progress and report calculations.
+- Keep API paths parameterized with `APPLICATION_NAME`.

@@ -18,22 +18,19 @@ interface WorkspaceSidebarProps {
   isLoading?: boolean
 }
 
-// Status color configuration
+// Status color configuration (ITv3 pipeline)
 const getStateColor = (state: string): string => {
   switch (state) {
     case 'annotating':
     case 'annotating_b':
     case 'annotating_c':
       return 'text-primary fill-primary'
-    case 'reviewing':
-    case 'reviewing_b':
-    case 'half_annotated':
-    case 'half_reviewed':
+    case 'annotated_a':
+    case 'annotated_b':
     case 'annotated':
+    case 'reviewing':
       return 'text-warning fill-warning'
     case 'reviewed':
-    case 'finalising':
-    case 'finalised':
       return 'text-success fill-success'
     case 'trashed':
       return 'text-destructive fill-destructive'
@@ -151,7 +148,7 @@ export function WorkspaceSidebar({
             </div>
 
             {/* Group Info */}
-            {task.group && task.group !== 'string' && (
+            {task.group_id && (
               <div className="space-y-2">
                 <h3 className="text-xs font-medium uppercase text-muted-foreground tracking-wider">
                   {t('sidebar.group')}
@@ -159,7 +156,7 @@ export function WorkspaceSidebar({
                 <div className="flex items-center gap-2 p-3 rounded-lg bg-sidebar-accent/50">
                   <Users className="h-4 w-4 shrink-0 text-muted-foreground" />
                   <p className="text-sm text-sidebar-foreground truncate">
-                    {task.group}
+                    {task.group_id}
                   </p>
                 </div>
               </div>
