@@ -42,7 +42,7 @@ export const useGetUserContributions = (
     staleTime: 1000 * 60 * 2,
     retry: 1,
     enabled:
-      ADMIN_FEATURE_AVAILABILITY.contributions &&
+      ADMIN_FEATURE_AVAILABILITY.userContributions &&
       enabled &&
       !!userId &&
       !!filters.start_date &&

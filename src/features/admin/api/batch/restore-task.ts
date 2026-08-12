@@ -2,7 +2,7 @@ import { useMutation, useQueryClient, type QueryClient } from '@tanstack/react-q
 import { apiClient } from '@/lib/axios'
 import { batchKeys } from './batch-keys'
 import { APPLICATION_NAME } from '@/lib/constant'
-import type { ApplicationBatchReport, BatchReport, BatchTask } from '@/types'
+import type { ApplicationBatchReport, Batch, BatchReport, BatchTask } from '@/types'
 
 interface RestoreTaskParams {
   taskId: string
@@ -41,15 +41,24 @@ export function applyRestoreTaskCache(
     }
   })
 
-  queryClient.setQueryData<ApplicationBatchReport>(
+  queryClient.setQueryData<ApplicationBatchReport[]>(
     batchKeys.applicationReport(APPLICATION_NAME),
     (old) => {
       if (!old) return old
-      return {
-        ...old,
-        trashed: Math.max(0, old.trashed - 1),
-        pending: old.pending + 1,
-      }
+
+      const batches = queryClient.getQueryData<Batch[]>(batchKeys.lists())
+      const groupName = batches?.find((batch) => batch.id === batchId)?.group_name
+      if (!groupName) return old
+
+      return old.map((report) =>
+        report.id === groupName
+          ? {
+              ...report,
+              trashed: Math.max(0, report.trashed - 1),
+              pending: report.pending + 1,
+            }
+          : report
+      )
     }
   )
 }

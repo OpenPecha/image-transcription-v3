@@ -78,7 +78,7 @@ export function UserReportDialog({ open, onOpenChange, user }: UserReportDialogP
     open
   )
 
-  if (!ADMIN_FEATURE_AVAILABILITY.contributions) {
+  if (!ADMIN_FEATURE_AVAILABILITY.userContributions) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-2xl">
@@ -89,8 +89,8 @@ export function UserReportDialog({ open, onOpenChange, user }: UserReportDialogP
             <DialogDescription>{t('users.report.description')}</DialogDescription>
           </DialogHeader>
           <AdminFeatureUnavailable
-            title={t('featureAvailability.contributionsTitle')}
-            description={t('featureAvailability.contributionsDescription')}
+            title={t('featureAvailability.userContributionsTitle')}
+            description={t('featureAvailability.userContributionsDescription')}
           />
         </DialogContent>
       </Dialog>

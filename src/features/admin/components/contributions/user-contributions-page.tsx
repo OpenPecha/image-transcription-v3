@@ -25,12 +25,12 @@ export function UserContributionsPage() {
         <p className="text-muted-foreground">{t('userContributions.description')}</p>
       </div>
 
-      {ADMIN_FEATURE_AVAILABILITY.contributions ? (
+      {ADMIN_FEATURE_AVAILABILITY.groupContributions ? (
         <AdminContributionsBody />
       ) : (
         <AdminFeatureUnavailable
-          title={t('featureAvailability.contributionsTitle')}
-          description={t('featureAvailability.contributionsDescription')}
+          title={t('featureAvailability.groupContributionsTitle')}
+          description={t('featureAvailability.groupContributionsDescription')}
         />
       )}
     </div>

@@ -173,8 +173,9 @@
     "task": "ལས་ཀ་ {{count}}",
     "failedToLoadStats": "ཚོ་སྒྲིག་སྡོམ་རྩིས་སྣོན་མ་ཐུབ།",
     "noTasksInBatch": "ཚོ་སྒྲིག་འདིར་ལས་ཀ་མེད།",
-    "individualBatches": "སོ་སོའི་ཚོ་སྒྲིག",
-    "applicationSummaryTitle": "ཚོ་སྒྲིག་ཚང་མའི་སྡོམ་རྩིས།",
+    "batchCount": "ཚོ་སྒྲིག {{count}}",
+    "noBatchesInGroup": "ཚོ་ཁག་འདིར་ཚོ་སྒྲིག་མེད།",
+    "ungrouped": "ཚོ་ཁག་མེད་པ།",
     "total": "བསྡོམས།",
     "status": "གནས་སྟངས།",
     "finalized": "ཞིབ་བཤེར་ཟིན། {{percentage}}%",
@@ -248,8 +249,10 @@
     "batchTasksDescription": "Image Transcription V3 ཞབས་ཞུས་ཚོ་སྒྲིག་ལས་ཀའི་ཐོ་དང་ CSV ཕྱིར་འདྲེན་ད་དུང་མ་བཟོས། ཚོ་སྒྲིག་སྙན་ཐོ་སྤྱོད་ཐུབ།",
     "batchExportUnavailable": "Image Transcription V3 ལ་ CSV ཕྱིར་འདྲེན་ད་ལྟ་སྤྱོད་མི་ཐུབ།",
     "batchTaskSearchUnavailable": "Image Transcription V3 ལ་ལས་ཀ་འཚོལ་བ་ད་ལྟ་སྤྱོད་མི་ཐུབ།",
-    "contributionsTitle": "བྱས་རྗེས་སྙན་ཐོ་ད་ལྟ་སྤྱོད་མི་ཐུབ།",
-    "contributionsDescription": "Image Transcription V3 ཞབས་ཞུས་སྤྱོད་མཁན་དང་སྡེ་ཚན་གྱི་བྱས་རྗེས་སྙན་ཐོ་ད་དུང་མ་བཟོས།"
+    "groupContributionsTitle": "སྡེ་ཚན་བྱས་རྗེས་སྙན་ཐོ་ད་ལྟ་སྤྱོད་མི་ཐུབ།",
+    "groupContributionsDescription": "Image Transcription V3 ཞབས་ཞུས་སྡེ་ཚན་གྱི་བྱས་རྗེས་སྙན་ཐོ་ད་དུང་མ་བཟོས།",
+    "userContributionsTitle": "སྤྱོད་མཁན་བྱས་རྗེས་སྙན་ཐོ་ད་ལྟ་སྤྱོད་མི་ཐུབ།",
+    "userContributionsDescription": "Image Transcription V3 ཞབས་ཞུས་སྤྱོད་མཁན་རེ་རེའི་བྱས་རྗེས་སྙན་ཐོ་ད་དུང་མ་བཟོས།"
   },
   "common": {
     "cancel": "དོར།",

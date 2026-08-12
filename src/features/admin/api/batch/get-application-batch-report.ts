@@ -5,8 +5,13 @@ import { batchKeys } from './batch-keys'
 
 const getApplicationBatchReport = async (
   applicationName: string
-): Promise<ApplicationBatchReport> => {
-  return apiClient.get(`/batch/application/${applicationName}/reports`)
+): Promise<ApplicationBatchReport[]> => {
+  const response = (await apiClient.get(
+    `/batch/application/${applicationName}/reports`
+  )) as ApplicationBatchReport[] | ApplicationBatchReport | null
+
+  if (Array.isArray(response)) return response
+  return response ? [response] : []
 }
 
 export const useGetApplicationBatchReport = (applicationName: string) => {
@@ -18,4 +23,3 @@ export const useGetApplicationBatchReport = (applicationName: string) => {
     retry: 1,
   })
 }
-

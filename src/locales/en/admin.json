@@ -173,8 +173,9 @@
     "task": "{{count}} task",
     "failedToLoadStats": "Failed to load batch statistics",
     "noTasksInBatch": "No tasks in this batch",
-    "individualBatches": "Individual Batches",
-    "applicationSummaryTitle": "All batches summary",
+    "batchCount": "{{count}} batches",
+    "noBatchesInGroup": "No batches in this group yet.",
+    "ungrouped": "Ungrouped",
     "total": "Total",
     "status": "Status",
     "finalized": "{{percentage}}% Reviewed",
@@ -248,8 +249,10 @@
     "batchTasksDescription": "Task listing and CSV export are not implemented by the Image Transcription V3 backend yet. Batch reports remain available.",
     "batchExportUnavailable": "CSV export is not available for Image Transcription V3 yet",
     "batchTaskSearchUnavailable": "Task search is not available for Image Transcription V3 yet.",
-    "contributionsTitle": "Contribution reports are not available yet",
-    "contributionsDescription": "User and group contribution reports are not implemented by the Image Transcription V3 backend yet."
+    "groupContributionsTitle": "Group contribution reports are not available yet",
+    "groupContributionsDescription": "Group contribution reports are not implemented by the Image Transcription V3 backend yet.",
+    "userContributionsTitle": "User contribution reports are not available yet",
+    "userContributionsDescription": "Per-user contribution reports are not implemented by the Image Transcription V3 backend yet."
   },
   "common": {
     "cancel": "Cancel",

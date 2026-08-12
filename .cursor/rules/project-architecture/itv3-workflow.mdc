@@ -59,11 +59,12 @@ The V3 backend does not yet implement:
 
 - batch task listing;
 - batch CSV export;
-- user or group contribution reports.
+- per-user contribution reports.
 
-Soft-gate these admin surfaces and do not call their V2-only endpoints.
-Batch reports and task restore are implemented; keep restore wired for when
-batch task listing becomes available.
+Group contribution summaries and per-group application batch reports are
+implemented. Soft-gate only the unavailable admin surfaces and do not call
+their V2-only endpoints. Batch reports and task restore are implemented; keep
+restore wired for when batch task listing becomes available.
 
 ## Frontend API rules
 

@@ -17,11 +17,25 @@ import { BatchTaskSearch } from './batch-task-search'
 
 export function BatchList() {
   const { t } = useTranslation('admin')
-  const { data: batches = [], isLoading } = useGetBatches()
-  const { data: applicationReport, isLoading: isApplicationReportLoading, isError: isApplicationReportError } =
-    useGetApplicationBatchReport(APPLICATION_NAME)
+  const { data: batches = [], isLoading: isBatchesLoading } = useGetBatches()
+  const {
+    data: applicationReports = [],
+    isLoading: isApplicationReportLoading,
+    isError: isApplicationReportError,
+  } = useGetApplicationBatchReport(APPLICATION_NAME)
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false)
-  
+
+  const reportIds = new Set(applicationReports.map((report) => report.id))
+  const ungroupedBatches = batches.filter(
+    (batch) => !reportIds.has(batch.group_name)
+  )
+
+  const isEmpty =
+    !isApplicationReportLoading &&
+    !isBatchesLoading &&
+    applicationReports.length === 0 &&
+    batches.length === 0
+
   return (
     <>
       <Card>
@@ -39,33 +53,47 @@ export function BatchList() {
           </div>
         </CardHeader>
         <CardContent className="pt-0">
-          <div className="mb-6 space-y-4">
-            <ApplicationBatchSummary
-              report={applicationReport}
-              isLoading={isApplicationReportLoading}
-              isError={isApplicationReportError}
-            />
-          </div>
-
-          <div className="mb-4 border-b" />
-
-          <div className="mb-3 text-sm font-semibold tracking-tight">
-            {t('batches.individualBatches')}
-          </div>
-
-          {isLoading ? (
-            <div className="space-y-3">
-              {[...Array(4)].map((_, i) => (
-                <BatchItemSkeleton key={i} />
-              ))}
-            </div>
-          ) : batches.length === 0 ? (
+          {isEmpty ? (
             <EmptyState onUploadClick={() => setUploadDialogOpen(true)} />
+          ) : isApplicationReportError ? (
+            <p className="py-4 text-sm text-muted-foreground">
+              {t('batches.failedToLoadStats')}
+            </p>
           ) : (
-            <div className="space-y-3">
-              {batches.map((batch) => (
-                <BatchItem key={batch.id} batch={batch} />
-              ))}
+            <div className="space-y-4">
+              {isApplicationReportLoading ? (
+                <>
+                  <ApplicationBatchSummary report={undefined} isLoading={true} />
+                  <ApplicationBatchSummary report={undefined} isLoading={true} />
+                </>
+              ) : (
+                applicationReports.map((report) => (
+                  <ApplicationBatchSummary
+                    key={report.id}
+                    report={report}
+                    batches={batches.filter(
+                      (batch) => batch.group_name === report.id
+                    )}
+                    isLoading={false}
+                    isBatchesLoading={isBatchesLoading}
+                  />
+                ))
+              )}
+
+              {!isApplicationReportLoading && ungroupedBatches.length > 0 && (
+                <div className="space-y-3 pt-2">
+                  <div className="text-sm font-semibold tracking-tight">
+                    {t('batches.ungrouped')}
+                  </div>
+                  {isBatchesLoading ? (
+                    [...Array(2)].map((_, i) => <BatchItemSkeleton key={i} />)
+                  ) : (
+                    ungroupedBatches.map((batch) => (
+                      <BatchItem key={batch.id} batch={batch} />
+                    ))
+                  )}
+                </div>
+              )}
             </div>
           )}
         </CardContent>
@@ -98,4 +126,3 @@ function EmptyState({ onUploadClick }: { onUploadClick: () => void }) {
     </div>
   )
 }
-

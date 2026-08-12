@@ -150,8 +150,14 @@ export interface BatchReport extends Omit<Batch, 'group_name'>, BatchStateCounts
   total_tasks: number
 }
 
-// Application-wide totals across every batch, returned as a single object
-export type ApplicationBatchReport = BatchReport
+/** Per-group rollup from GET /batch/application/{app}/reports (`id` = group name). */
+export type ApplicationBatchReport = {
+  id: string
+  name: string
+  created: string
+  group_id: string
+  total_tasks: number
+} & BatchStateCounts
 
 // Individual task in upload JSON
 export interface BatchUploadTask {
