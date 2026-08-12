@@ -1,11 +1,12 @@
 /**
- * Slot reject scope for ITV3 submit=false (reviewer in `reviewing` only):
+ * Slot reject scope for ITV3 submit=false (reviewer in `reviewing` only).
+ * Matches backend `ImageTranscriptionV3SubmitInput.reject_target`:
  * - 1 = Annotator A
  * - 2 = Annotator B
  * - 3 = Annotator C
  * - 4 = all annotators
- * - 5 = Annotators A + B
- * - 6 = Annotators B + C
+ * - 5 = Annotators B + C
+ * - 6 = Annotators A + B
  * - 7 = Annotators A + C
  */
 export type RejectTarget = 1 | 2 | 3 | 4 | 5 | 6 | 7
@@ -14,8 +15,8 @@ export const REJECT_TARGET_ANNOTATOR_A = 1 as const
 export const REJECT_TARGET_ANNOTATOR_B = 2 as const
 export const REJECT_TARGET_ANNOTATOR_C = 3 as const
 export const REJECT_TARGET_ALL_ANNOTATORS = 4 as const
-export const REJECT_TARGET_ANNOTATORS_AB = 5 as const
-export const REJECT_TARGET_ANNOTATORS_BC = 6 as const
+export const REJECT_TARGET_ANNOTATORS_BC = 5 as const
+export const REJECT_TARGET_ANNOTATORS_AB = 6 as const
 export const REJECT_TARGET_ANNOTATORS_AC = 7 as const
 
 export type AnnotatorRejectSlot = 'A' | 'B' | 'C'
@@ -51,10 +52,10 @@ export function decodeRejectTarget(target: RejectTarget): AnnotatorRejectSlot[] 
       return ['C']
     case REJECT_TARGET_ALL_ANNOTATORS:
       return [...SLOT_ORDER]
-    case REJECT_TARGET_ANNOTATORS_AB:
-      return ['A', 'B']
     case REJECT_TARGET_ANNOTATORS_BC:
       return ['B', 'C']
+    case REJECT_TARGET_ANNOTATORS_AB:
+      return ['A', 'B']
     case REJECT_TARGET_ANNOTATORS_AC:
       return ['A', 'C']
   }

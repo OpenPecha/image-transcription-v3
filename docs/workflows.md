@@ -62,8 +62,8 @@ For rejection, the reviewer submits a comment and a `reject_target`:
 | `2` | Annotator B |
 | `3` | Annotator C |
 | `4` | All annotators |
-| `5` | Annotators A + B |
-| `6` | Annotators B + C |
+| `5` | Annotators B + C |
+| `6` | Annotators A + B |
 | `7` | Annotators A + C |
 
 The reject dialog uses checkboxes for A / B / C (plus All) so any combination
