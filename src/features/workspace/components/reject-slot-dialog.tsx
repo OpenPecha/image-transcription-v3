@@ -12,13 +12,8 @@ import {
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import type { RejectTarget } from '../types/reject-target'
-import {
-  REJECT_TARGET_ANNOTATOR_A,
-  REJECT_TARGET_ANNOTATOR_B,
-  REJECT_TARGET_ANNOTATOR_C,
-  REJECT_TARGET_ALL_ANNOTATORS,
-} from '../types/reject-target'
+import type { AnnotatorRejectSlot, RejectTarget } from '../types/reject-target'
+import { encodeRejectSlots } from '../types/reject-target'
 
 export type RejectConfirmParams = {
   reject_target: RejectTarget
@@ -34,12 +29,17 @@ type RejectSlotDialogProps = {
   taskName: string
 }
 
-const REJECT_OPTIONS = [
-  { target: REJECT_TARGET_ANNOTATOR_A, labelKey: 'actions.rejectAnnotatorA' },
-  { target: REJECT_TARGET_ANNOTATOR_B, labelKey: 'actions.rejectAnnotatorB' },
-  { target: REJECT_TARGET_ANNOTATOR_C, labelKey: 'actions.rejectAnnotatorC' },
-  { target: REJECT_TARGET_ALL_ANNOTATORS, labelKey: 'actions.rejectAll' },
-] as const
+const REJECT_SLOT_OPTIONS: {
+  slot: AnnotatorRejectSlot
+  labelKey:
+    | 'actions.rejectAnnotator1'
+    | 'actions.rejectAnnotator2'
+    | 'actions.rejectAnnotator3'
+}[] = [
+  { slot: 'A', labelKey: 'actions.rejectAnnotator1' },
+  { slot: 'B', labelKey: 'actions.rejectAnnotator2' },
+  { slot: 'C', labelKey: 'actions.rejectAnnotator3' },
+]
 
 export function RejectSlotDialog({
   open,
@@ -53,22 +53,40 @@ export function RejectSlotDialog({
   const { t: tCommon } = useTranslation('common')
   const copyPrefix = 'dialogs.reject.choose'
 
-  const [selectedTarget, setSelectedTarget] = useState<RejectTarget | null>(null)
+  const [selectedSlots, setSelectedSlots] = useState<Set<AnnotatorRejectSlot>>(new Set())
   const [comment, setComment] = useState('')
 
   useEffect(() => {
     if (!open) {
-      setSelectedTarget(null)
+      setSelectedSlots(new Set())
       setComment('')
     }
   }, [open])
 
   const trimmedComment = comment.trim()
-  const canConfirm = selectedTarget !== null && trimmedComment.length > 0 && !isLoading
+  const rejectTarget = encodeRejectSlots(selectedSlots)
+  const canConfirm = rejectTarget !== null && trimmedComment.length > 0 && !isLoading
+  const allSelected = selectedSlots.size === REJECT_SLOT_OPTIONS.length
+
+  const toggleSlot = (slot: AnnotatorRejectSlot) => {
+    setSelectedSlots((prev) => {
+      const next = new Set(prev)
+      if (next.has(slot)) next.delete(slot)
+      else next.add(slot)
+      return next
+    })
+  }
+
+  const toggleAll = () => {
+    setSelectedSlots((prev) => {
+      if (prev.size === REJECT_SLOT_OPTIONS.length) return new Set()
+      return new Set(REJECT_SLOT_OPTIONS.map((option) => option.slot))
+    })
+  }
 
   const handleConfirm = () => {
-    if (!canConfirm || selectedTarget === null) return
-    onConfirm({ reject_target: selectedTarget, comment: trimmedComment })
+    if (!canConfirm || rejectTarget === null) return
+    onConfirm({ reject_target: rejectTarget, comment: trimmedComment })
   }
 
   return (
@@ -93,28 +111,39 @@ export function RejectSlotDialog({
             <legend className="text-sm font-medium leading-none">
               {t(`${copyPrefix}.targetPrompt`)}
             </legend>
+            <p className="text-xs text-muted-foreground">{t(`${copyPrefix}.targetHint`)}</p>
             <div
-              role="radiogroup"
+              role="group"
               aria-label={t(`${copyPrefix}.targetPrompt`)}
               className="flex flex-wrap gap-x-5 gap-y-3"
             >
-              {REJECT_OPTIONS.map(({ target, labelKey }) => (
+              {REJECT_SLOT_OPTIONS.map(({ slot, labelKey }) => (
                 <label
-                  key={target}
+                  key={slot}
                   className="flex cursor-pointer items-center gap-2 text-sm leading-none"
                 >
                   <input
-                    type="radio"
-                    name="reject-target-annotator"
-                    value={target}
-                    checked={selectedTarget === target}
-                    onChange={() => setSelectedTarget(target)}
+                    type="checkbox"
+                    name={`reject-slot-${slot}`}
+                    checked={selectedSlots.has(slot)}
+                    onChange={() => toggleSlot(slot)}
                     disabled={isLoading}
                     className="h-4 w-4 accent-destructive"
                   />
                   <span>{t(labelKey)}</span>
                 </label>
               ))}
+              <label className="flex cursor-pointer items-center gap-2 text-sm leading-none">
+                <input
+                  type="checkbox"
+                  name="reject-slot-all"
+                  checked={allSelected}
+                  onChange={toggleAll}
+                  disabled={isLoading}
+                  className="h-4 w-4 accent-destructive"
+                />
+                <span>{t('actions.rejectAllOption')}</span>
+              </label>
             </div>
           </fieldset>
 

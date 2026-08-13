@@ -49,7 +49,8 @@ Admin report buckets are `pending`, `annotated_a`, `annotated_b`, `annotated`,
 - Annotator A may trash with `submit: false`; Annotators B and C may not.
 - The reviewer approves only in `reviewing`; approval transitions to `reviewed`.
 - A reviewer rejection uses `submit: false`, a comment, and `reject_target`:
-  `1` for A, `2` for B, `3` for C, and `4` for all annotators.
+  `1` for A, `2` for B, `3` for C, `4` for all annotators,
+  `5` for B+C, `6` for A+B, and `7` for A+C.
 - Assignment payload rejection history uses `rejection_count` and
   `comment_A`, `comment_B`, and `comment_C`.
 

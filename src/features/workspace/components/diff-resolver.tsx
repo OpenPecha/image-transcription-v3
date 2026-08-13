@@ -29,8 +29,10 @@ import {
   formatDiffDisplay,
   getAnnotatorOptionLabel,
   getDiffProposedValue,
+  groupDiffOptions,
   isDiffResolved,
   isDuplicateReviewerInput,
+  isPresetGroupSelected,
   countPresetResolutionChoices,
 } from '../utils/parse-tdiff'
 import { parseTextSegmentSelection } from '../utils/text-selection'
@@ -384,14 +386,16 @@ export const DiffResolver = forwardRef<DiffResolverHandle, DiffResolverProps>(fu
         return
       }
 
-      const presetIndex = Number(e.key) - 1
-      if (presetIndex >= 0 && presetIndex < seg.options.length) {
+      const optionGroups = groupDiffOptions(seg.options)
+      const groupIndex = Number(e.key) - 1
+      if (groupIndex >= 0 && groupIndex < optionGroups.length) {
         e.preventDefault()
-        selectPreset(diffId, presetIndex, { keepOpen: true })
+        const primarySlot = optionGroups[groupIndex].slotIndexes[0]
+        selectPreset(diffId, primarySlot, { keepOpen: true })
         return
       }
 
-      const customShortcutKey = getCustomShortcutKey(seg.options.length)
+      const customShortcutKey = getCustomShortcutKey(optionGroups.length)
       if (customShortcutKey && e.key === customShortcutKey) {
         e.preventDefault()
         if (isDuplicateReviewerInput(seg)) {
@@ -409,15 +413,17 @@ export const DiffResolver = forwardRef<DiffResolverHandle, DiffResolverProps>(fu
       if (isEditableTarget(e.target)) return
 
       const diffId = seg.id
-      const presetIndex = Number(e.key) - 1
+      const optionGroups = groupDiffOptions(seg.options)
+      const groupIndex = Number(e.key) - 1
 
-      if (presetIndex >= 0 && presetIndex < seg.options.length) {
+      if (groupIndex >= 0 && groupIndex < optionGroups.length) {
         e.preventDefault()
-        selectPreset(diffId, presetIndex, { keepOpen: true })
+        const primarySlot = optionGroups[groupIndex].slotIndexes[0]
+        selectPreset(diffId, primarySlot, { keepOpen: true })
         return
       }
 
-      const customShortcutKey = getCustomShortcutKey(seg.options.length)
+      const customShortcutKey = getCustomShortcutKey(optionGroups.length)
       if (customShortcutKey && e.key === customShortcutKey) {
         e.preventDefault()
         e.stopPropagation()
@@ -458,6 +464,9 @@ export const DiffResolver = forwardRef<DiffResolverHandle, DiffResolverProps>(fu
     if (index === 2 && referenceTabLabels.tab3) return referenceTabLabels.tab3
     return t('diffResolver.optionPreset', { label: getAnnotatorOptionLabel(index) })
   }
+
+  const getGroupedPresetLabel = (slotIndexes: number[]): string =>
+    slotIndexes.map((index) => getPresetOptionLabel(index)).join(' + ')
 
   const presetSummaryText = useMemo(() => {
     if (!showReferenceTabs || diffSegments.length === 0) return ''
@@ -643,14 +652,15 @@ export const DiffResolver = forwardRef<DiffResolverHandle, DiffResolverProps>(fu
             const isCustomSelected = seg.selected?.kind === 'custom'
             const isDuplicateReviewer = isDuplicateReviewerInput(seg, customValue)
             const reviewerInputLabel = t('diffResolver.reviewerInput')
+            const optionGroups = groupDiffOptions(seg.options)
             const optionsSummary = [
-              ...seg.options.map(
-                (option, index) =>
-                  `${getPresetOptionLabel(index)}: ${option}`
+              ...optionGroups.map(
+                (group) =>
+                  `${getGroupedPresetLabel(group.slotIndexes)}: ${group.text}`
               ),
               `${reviewerInputLabel}: ${customValue}`,
             ].join(' | ')
-            const customShortcutKey = getCustomShortcutKey(seg.options.length)
+            const customShortcutKey = getCustomShortcutKey(optionGroups.length)
 
             return (
               <DropdownMenu
@@ -698,17 +708,17 @@ export const DiffResolver = forwardRef<DiffResolverHandle, DiffResolverProps>(fu
                   onCloseAutoFocus={(e) => e.preventDefault()}
                   onKeyDown={(e) => handleMenuKeyDown(e, seg)}
                 >
-                  {seg.options.map((option, index) => {
-                    const isSelected =
-                      seg.selected?.kind === 'preset' && seg.selected.index === index
-                    const shortcut = index < 9 ? String(index + 1) : undefined
+                  {optionGroups.map((group, groupIndex) => {
+                    const isSelected = isPresetGroupSelected(seg, group)
+                    const shortcut = groupIndex < 9 ? String(groupIndex + 1) : undefined
+                    const primarySlot = group.slotIndexes[0]
 
                     return (
                       <DropdownMenuItem
-                        key={index}
+                        key={group.slotIndexes.join('-')}
                         onSelect={(e) => {
                           e.preventDefault()
-                          selectPreset(seg.id, index, { keepOpen: true })
+                          selectPreset(seg.id, primarySlot, { keepOpen: true })
                         }}
                         className="flex items-start justify-between gap-4 cursor-pointer py-2 px-3"
                       >
@@ -716,8 +726,8 @@ export const DiffResolver = forwardRef<DiffResolverHandle, DiffResolverProps>(fu
                           className="min-w-0 flex-1 text-left whitespace-pre-wrap break-words"
                           style={{ fontFamily: resolvedFontFamily }}
                         >
-                          {getPresetOptionLabel(index)}:{' '}
-                          {formatDiffDisplay(option)}
+                          {getGroupedPresetLabel(group.slotIndexes)}:{' '}
+                          {formatDiffDisplay(group.text)}
                         </span>
                         <div className="flex shrink-0 items-start gap-2 pt-0.5">
                           {isSelected && <Check className="h-4 w-4 text-emerald-600" />}

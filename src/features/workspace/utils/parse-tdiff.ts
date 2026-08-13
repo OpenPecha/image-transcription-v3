@@ -23,6 +23,41 @@ export function getAnnotatorOptionLabel(index: number): string {
   return String.fromCharCode(65 + index)
 }
 
+/** Unique option text with every annotator slot that produced it. */
+export type DiffOptionGroup = {
+  text: string
+  slotIndexes: number[]
+}
+
+/**
+ * Groups identical option strings so the reviewer UI can show one row
+ * with combined labels (e.g. A + C) instead of duplicate choices.
+ */
+export function groupDiffOptions(options: string[]): DiffOptionGroup[] {
+  const groups: DiffOptionGroup[] = []
+  const textToGroupIndex = new Map<string, number>()
+
+  options.forEach((text, slotIndex) => {
+    const existingIndex = textToGroupIndex.get(text)
+    if (existingIndex !== undefined) {
+      groups[existingIndex].slotIndexes.push(slotIndex)
+      return
+    }
+    textToGroupIndex.set(text, groups.length)
+    groups.push({ text, slotIndexes: [slotIndex] })
+  })
+
+  return groups
+}
+
+export function isPresetGroupSelected(
+  seg: DiffSegment,
+  group: DiffOptionGroup
+): boolean {
+  if (seg.selected?.kind !== 'preset') return false
+  return group.slotIndexes.includes(seg.selected.index)
+}
+
 export type Segment = TextSegment | DiffSegment
 
 function extractOptionsFromParsed(parsed: Record<string, unknown>): string[] {
@@ -156,7 +191,11 @@ export function allDiffsResolved(segments: Segment[]): boolean {
   return segments.every((seg) => seg.type !== 'diff' || isDiffResolved(seg))
 }
 
-/** Count confirmed preset resolutions for slots A/B/C (indexes 0/1/2). Custom choices are excluded. */
+/**
+ * Count confirmed preset resolutions for slots A/B/C (indexes 0/1/2).
+ * Custom choices are excluded. When several slots share the chosen text
+ * (grouped option), each matching slot is credited.
+ */
 export function countPresetResolutionChoices(
   diffSegments: DiffSegment[]
 ): { countA: number; countB: number; countC: number } {
@@ -166,9 +205,15 @@ export function countPresetResolutionChoices(
 
   for (const seg of diffSegments) {
     if (!isDiffResolved(seg) || seg.selected?.kind !== 'preset') continue
-    if (seg.selected.index === 0) countA++
-    else if (seg.selected.index === 1) countB++
-    else if (seg.selected.index === 2) countC++
+    const selectedText = seg.options[seg.selected.index]
+    if (selectedText === undefined) continue
+
+    seg.options.forEach((option, index) => {
+      if (option !== selectedText) return
+      if (index === 0) countA++
+      else if (index === 1) countB++
+      else if (index === 2) countC++
+    })
   }
 
   return { countA, countB, countC }
