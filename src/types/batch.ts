@@ -44,7 +44,10 @@ export interface BatchTask {
   annotator_a_username?: string | null
   annotator_b_username?: string | null
   annotator_c_username?: string | null
-  /** Single ITv3 reviewer username (API may still send as reviewer_a_username). */
+  /**
+   * Normalized reviewer username used by UI.
+   * API may send ITv3 `reviewer_username` or ITv2 `reviewer_a_username`.
+   */
   reviewer_a_username?: string | null
   trashed_by?: string | null
   annotation_a_rejection_count?: number
@@ -63,6 +66,7 @@ export interface BatchTaskSearchResult {
   annotator_a_username?: string | null
   annotator_b_username?: string | null
   annotator_c_username?: string | null
+  /** Normalized; API may send `reviewer_username` (ITv3). */
   reviewer_a_username?: string | null
   trashed_by?: string | null
   batch_id: string
@@ -71,6 +75,7 @@ export interface BatchTaskSearchResult {
   annotation_transcript_order_1: string | null
   annotation_transcript_order_2: string | null
   annotation_transcript_order_3: string | null
+  /** Normalized; API may send `reviewed_transcript` (ITv3). */
   reviewed_transcript_order_1: string | null
   annotation_a_rejection_count?: number
   annotation_b_rejection_count?: number
@@ -110,7 +115,7 @@ export function getBatchTaskSearchParticipantTranscript(
     annotator_a: task.annotation_transcript_order_1,
     annotator_b: task.annotation_transcript_order_2,
     annotator_c: task.annotation_transcript_order_3,
-    reviewer: task.reviewed_transcript_order_1,
+    reviewer: task.reviewed_transcript_order_1 ?? null,
   }
 
   const value = transcriptByRole[role]?.trim()
