@@ -58,14 +58,13 @@ Admin report buckets are `pending`, `annotated_a`, `annotated_b`, `annotated`,
 
 The V3 backend does not yet implement:
 
-- batch task listing;
 - batch CSV export;
 - per-user contribution reports.
 
-Group contribution summaries and per-group application batch reports are
-implemented. Soft-gate only the unavailable admin surfaces and do not call
-their V2-only endpoints. Batch reports and task restore are implemented; keep
-restore wired for when batch task listing becomes available.
+Batch task listing, task search, group contribution summaries, per-group
+application batch reports, batch reports, and task restore are implemented.
+Soft-gate only the unavailable admin surfaces and do not call their V2-only
+endpoints.
 
 ## Frontend API rules
 
@@ -73,3 +72,6 @@ restore wired for when batch task listing becomes available.
 - Gate role actions by the active V3 state, not only by the user's role.
 - Treat `reviewed` as terminal completion in progress and report calculations.
 - Keep API paths parameterized with `APPLICATION_NAME`.
+- Batch list/search responses may use ITv3 field names (`reviewer_username`,
+  `reviewed_transcript`); normalize at the API boundary to the UI shape
+  (`reviewer_a_username`, `reviewed_transcript_order_1`).

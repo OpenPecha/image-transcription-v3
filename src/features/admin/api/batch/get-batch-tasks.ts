@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { ADMIN_FEATURE_AVAILABILITY } from '@/features/admin/lib/admin-feature-availability'
+import { normalizeBatchTask } from '@/features/admin/lib/normalize-batch-task'
 import { apiClient } from '@/lib/axios'
 import { type BatchTask, type BatchTaskState } from '@/types'
 import { batchKeys } from './batch-keys'
@@ -11,7 +12,11 @@ interface GetBatchTasksParams {
 
 const getBatchTasks = async ({ batchId, state }: GetBatchTasksParams): Promise<BatchTask[]> => {
   const params = state && state !== 'all' ? { state } : {}
-  return apiClient.get(`/batch/${batchId}/tasks`, { params })
+  const tasks = (await apiClient.get(`/batch/${batchId}/tasks`, {
+    params,
+  })) as unknown as Array<BatchTask & { reviewer_username?: string | null }> | null
+
+  return (tasks ?? []).map(normalizeBatchTask)
 }
 
 export const useGetBatchTasks = (batchId: string, state?: BatchTaskState | 'all') => {

@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { ADMIN_FEATURE_AVAILABILITY } from '@/features/admin/lib/admin-feature-availability'
+import { normalizeBatchTaskSearchResult } from '@/features/admin/lib/normalize-batch-task'
 import { apiClient } from '@/lib/axios'
 import { APPLICATION_NAME } from '@/lib/constant'
 import type { BatchTaskSearchResult } from '@/types'
@@ -11,14 +12,27 @@ const searchApplicationTasks = async (
   applicationName: string,
   taskName: string
 ): Promise<BatchTaskSearchResult[]> => {
-  const data = (await apiClient.get<
-    BatchTaskSearchResult | BatchTaskSearchResult[] | null
-  >(`/batch/application/${applicationName}/tasks/search`, {
-    params: { task_name: taskName },
-  })) as unknown as BatchTaskSearchResult | BatchTaskSearchResult[] | null
+  const data = (await apiClient.get(
+    `/batch/application/${applicationName}/tasks/search`,
+    {
+      params: { task_name: taskName },
+    }
+  )) as unknown as
+    | (BatchTaskSearchResult & {
+        reviewer_username?: string | null
+        reviewed_transcript?: string | null
+      })
+    | Array<
+        BatchTaskSearchResult & {
+          reviewer_username?: string | null
+          reviewed_transcript?: string | null
+        }
+      >
+    | null
 
   if (!data) return []
-  return Array.isArray(data) ? data : [data]
+  const items = Array.isArray(data) ? data : [data]
+  return items.map(normalizeBatchTaskSearchResult)
 }
 
 export const useSearchApplicationTasks = (submittedTaskName: string) => {
