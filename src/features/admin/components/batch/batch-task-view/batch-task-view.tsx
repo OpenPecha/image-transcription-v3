@@ -58,11 +58,7 @@ function AvailableBatchTaskView() {
   const restoringRef = useRef(false)
 
   // CSV download hook
-  const {
-    download: downloadCsv,
-    isDownloading,
-    isAvailable: isExportAvailable,
-  } = useBatchCsvDownload({
+  const { download: downloadCsv, isDownloading } = useBatchCsvDownload({
     batchId: batchId!,
     onError: (error) => {
       addToast({
@@ -223,13 +219,9 @@ function AvailableBatchTaskView() {
             variant="outline"
             size="icon"
             onClick={downloadCsv}
-            disabled={!isExportAvailable || isDownloading || isLoadingReport}
+            disabled={isDownloading || isLoadingReport}
             className="h-9 w-9"
-            title={
-              isExportAvailable
-                ? t('batches.downloadCsv')
-                : t('featureAvailability.batchExportUnavailable')
-            }
+            title={t('batches.downloadCsv')}
           >
             {isDownloading ? (
               <Loader2 className="h-4 w-4 animate-spin" />

@@ -12,6 +12,14 @@ const CSV_COLUMNS = [
   { key: 'orientation', header: 'Orientation' },
   { key: 'state', header: 'Status' },
   { key: 'final_transcript', header: 'Final Transcript' },
+  { key: 'final_char_count', header: 'Final Char Count' },
+  { key: 'annotator_1_total_char_difference', header: 'Annotator 1 Total Char Difference' },
+  { key: 'annotator_1_char_percent_diff', header: 'Annotator 1 Char Percent Diff' },
+  { key: 'annotator_2_total_char_difference', header: 'Annotator 2 Total Char Difference' },
+  { key: 'annotator_2_char_percent_diff', header: 'Annotator 2 Char Percent Diff' },
+  { key: 'annotator_3_total_char_difference', header: 'Annotator 3 Total Char Difference' },
+  { key: 'annotator_3_char_percent_diff', header: 'Annotator 3 Char Percent Diff' },
+  { key: 'reviewer_total_char_difference', header: 'Reviewer Total Char Difference' },
 ] as const satisfies ReadonlyArray<{ key: keyof BatchExportTask; header: string }>
 
 /**

@@ -58,11 +58,11 @@ Admin report buckets are `pending`, `annotated_a`, `annotated_b`, `annotated`,
 
 The V3 backend does not yet implement:
 
-- batch CSV export;
 - per-user contribution reports.
 
-Batch task listing, task search, group contribution summaries, per-group
-application batch reports, batch reports, and task restore are implemented.
+Batch task listing, task search, batch CSV export, group contribution summaries,
+per-group application batch reports, batch reports, and task restore are
+implemented.
 Soft-gate only the unavailable admin surfaces and do not call their V2-only
 endpoints.
 
@@ -75,3 +75,6 @@ endpoints.
 - Batch list/search responses may use ITv3 field names (`reviewer_username`,
   `reviewed_transcript`); normalize at the API boundary to the UI shape
   (`reviewer_a_username`, `reviewed_transcript_order_1`).
+- Batch export rows use `review_transcript`; normalize it to `final_transcript`.
+  Export character metrics (`final_char_count`, `annotator_1/2/3_*`,
+  `reviewer_total_char_difference`) are only populated for `reviewed` tasks.

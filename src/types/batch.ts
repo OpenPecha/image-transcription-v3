@@ -13,7 +13,17 @@ export type BatchExportTask = {
   image_url: string
   orientation: 'landscape' | 'portrait'
   state: BatchTaskState
+  /** Normalized; API may send `review_transcript` (ITv3). */
   final_transcript: string | null
+  /** Metrics below are only populated for `reviewed` tasks with stored metrics. */
+  final_char_count: number | null
+  annotator_1_total_char_difference: number | null
+  annotator_1_char_percent_diff: number | null
+  annotator_2_total_char_difference: number | null
+  annotator_2_char_percent_diff: number | null
+  annotator_3_total_char_difference: number | null
+  annotator_3_char_percent_diff: number | null
+  reviewer_total_char_difference: number | null
 }
 
 // Response from batch export endpoint

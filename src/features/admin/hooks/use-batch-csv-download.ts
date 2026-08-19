@@ -1,6 +1,5 @@
 import { useState, useCallback } from 'react'
 
-import { ADMIN_FEATURE_AVAILABILITY } from '@/features/admin/lib/admin-feature-availability'
 import { exportBatch } from '../api/batch'
 import { exportBatchTasksToCsv } from '../utils/batch-csv-export'
 
@@ -12,7 +11,6 @@ type UseBatchCsvDownloadOptions = {
 type UseBatchCsvDownloadReturn = {
   download: () => Promise<void>
   isDownloading: boolean
-  isAvailable: boolean
 }
 
 /**
@@ -28,7 +26,7 @@ export function useBatchCsvDownload({
   const [isDownloading, setIsDownloading] = useState(false)
 
   const download = useCallback(async () => {
-    if (!ADMIN_FEATURE_AVAILABILITY.batchExport || !batchId || isDownloading) return
+    if (!batchId || isDownloading) return
 
     setIsDownloading(true)
 
@@ -52,6 +50,5 @@ export function useBatchCsvDownload({
   return {
     download,
     isDownloading,
-    isAvailable: ADMIN_FEATURE_AVAILABILITY.batchExport,
   }
 }

@@ -247,7 +247,6 @@
   "featureAvailability": {
     "batchTasksTitle": "ཚོ་སྒྲིག་གི་ལས་ཀ་ད་ལྟ་སྤྱོད་མི་ཐུབ།",
     "batchTasksDescription": "ལས་ཀའི་ཐོ་ད་ལྟ་སྤྱོད་མི་ཐུབ། ཚོ་སྒྲིག་སྙན་ཐོ་སྤྱོད་ཐུབ།",
-    "batchExportUnavailable": "Image Transcription V3 ལ་ CSV ཕྱིར་འདྲེན་ད་ལྟ་སྤྱོད་མི་ཐུབ།",
     "batchTaskSearchUnavailable": "ལས་ཀ་འཚོལ་བ་ད་ལྟ་སྤྱོད་མི་ཐུབ།",
     "groupContributionsTitle": "སྡེ་ཚན་བྱས་རྗེས་སྙན་ཐོ་ད་ལྟ་སྤྱོད་མི་ཐུབ།",
     "groupContributionsDescription": "སྡེ་ཚན་གྱི་བྱས་རྗེས་སྙན་ཐོ་ད་ལྟ་སྤྱོད་མི་ཐུབ།",

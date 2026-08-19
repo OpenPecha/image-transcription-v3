@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { AlertTriangle, ArrowRight, Eye } from 'lucide-react'
+import { AlertTriangle, ArrowRight, Download, Eye, Loader2 } from 'lucide-react'
 import { ADMIN_FEATURE_AVAILABILITY } from '@/features/admin/lib/admin-feature-availability'
 import { cn } from '@/lib/utils'
+import { useUIStore } from '@/store/use-ui-store'
+import { useBatchCsvDownload } from '../../hooks/use-batch-csv-download'
 
 type BatchStatsFooterProps = {
   batchId: string
@@ -16,7 +18,19 @@ export function BatchStatsFooter({
   finalizedPercentage,
 }: BatchStatsFooterProps) {
   const { t } = useTranslation('admin')
+  const { addToast } = useUIStore()
   const canViewTasks = ADMIN_FEATURE_AVAILABILITY.batchTaskListing
+
+  const { download: downloadCsv, isDownloading } = useBatchCsvDownload({
+    batchId,
+    onError: (error) => {
+      addToast({
+        title: t('batches.downloadFailed'),
+        description: error.message,
+        variant: 'destructive',
+      })
+    },
+  })
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 pt-3 text-sm">
@@ -61,6 +75,21 @@ export function BatchStatsFooter({
               </span>
             </span>
           ))}
+
+        <button
+          type="button"
+          onClick={downloadCsv}
+          disabled={isDownloading}
+          className="inline-flex items-center gap-1.5 font-medium text-slate-600 transition-colors hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-60"
+          title={t('batches.downloadCsv')}
+        >
+          {isDownloading ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <Download className="h-3.5 w-3.5" />
+          )}
+          {t('batches.downloadCsv')}
+        </button>
 
         {canViewTasks ? (
           <Link
