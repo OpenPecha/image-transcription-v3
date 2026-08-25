@@ -91,8 +91,8 @@ Admins upload task files and assign batches to groups. New tasks enter
 
 ### Temporarily unavailable V3 features
 
-The backend does not yet implement batch CSV export or per-user contribution
-reports for `imagetranscriptionv3`. Those admin surfaces show an unavailable
-notice instead of calling V2-only endpoints. Batch task listing, task search,
+The backend does not yet implement per-user contribution reports for
+`imagetranscriptionv3`. Those admin surfaces show an unavailable notice instead
+of calling V2-only endpoints. Batch task listing, task search, batch CSV export,
 group contribution summaries, per-group batch reports, and task restore are
 available.

@@ -247,7 +247,6 @@
   "featureAvailability": {
     "batchTasksTitle": "Batch tasks are not available yet",
     "batchTasksDescription": "Task listing is not available right now. Batch reports remain available.",
-    "batchExportUnavailable": "CSV export is not available for Image Transcription V3 yet",
     "batchTaskSearchUnavailable": "Task search is not available right now.",
     "groupContributionsTitle": "Group contribution reports are not available yet",
     "groupContributionsDescription": "Group contribution reports are not available right now.",
