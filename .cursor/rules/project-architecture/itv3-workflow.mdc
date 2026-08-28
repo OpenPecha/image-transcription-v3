@@ -54,17 +54,25 @@ Admin report buckets are `pending`, `annotated_a`, `annotated_b`, `annotated`,
 - Assignment payload rejection history uses `rejection_count` and
   `comment_A`, `comment_B`, and `comment_C`.
 
-## Current backend limitations
+## Contribution reports
 
-The V3 backend does not yet implement:
+`GET /tasks/imagetranscriptionv3/{user_id}/contributions` returns
+`{ tasks[], contribution_summary }`, where `contribution_summary.annotator` and
+`contribution_summary.reviewer` are independent and each is `null` when the user
+did no work of that kind in the range. Detect dual annotator/reviewer work from
+these blocks and from each `tasks[]` row's `role`, never from the user's
+assigned role. Render annotation and review totals as separate sets; they are
+scored against different anchors and feed salary separately.
 
-- per-user contribution reports.
+ITv3 summaries omit the V2-only fields `tasks_final_reviewed`,
+`tasks_reviewed_as_r1`, and `review_char_count`. The ITv3 reviewer block has no
+rejections-received or `Lev(Ri, F)` fields because the review transcript is the
+terminal output. Annotator `tasks_reviewed` means "my annotation reached
+`reviewed`", not "I reviewed".
 
 Batch task listing, task search, batch CSV export, group contribution summaries,
-per-group application batch reports, batch reports, and task restore are
+per-group application batch reports, batch reports, and task restore are all
 implemented.
-Soft-gate only the unavailable admin surfaces and do not call their V2-only
-endpoints.
 
 ## Frontend API rules
 

@@ -1,69 +1,120 @@
 import type {
   Itv3AnnotatorContributionSummary,
-  Itv3ContributionRejectionMetrics,
-  Itv3ContributionSummary,
-  Itv3RejectionsMadeMetrics,
+  Itv3ContributionRole,
+  Itv3ContributionTask,
   Itv3ReviewerContributionSummary,
   UserContributionReportResponse,
 } from '@/types/user-contribution-report'
-import { UserRole, normalizeUserRole } from '@/types/user'
 
-export type Itv3ReportRoleSummary =
-  | Itv3AnnotatorContributionSummary
-  | Itv3ReviewerContributionSummary
+type RawRecord = Record<string, unknown>
 
-export function getContributionSummaryForRole(
-  summary: Itv3ContributionSummary | undefined,
-  role: UserRole | string | undefined
-): Itv3ReportRoleSummary | null {
-  if (!summary) return null
+const toNumber = (value: unknown): number =>
+  typeof value === 'number' && Number.isFinite(value) ? value : 0
 
-  const normalized = normalizeUserRole(role)
-  if (normalized === UserRole.Annotator) return summary.annotator
-  if (normalized === UserRole.Reviewer) return summary.reviewer
-  return null
+const toNullableNumber = (value: unknown): number | null =>
+  typeof value === 'number' && Number.isFinite(value) ? value : null
+
+const toText = (value: unknown): string => (typeof value === 'string' ? value : '')
+
+const asRecord = (value: unknown): RawRecord | null =>
+  typeof value === 'object' && value !== null ? (value as RawRecord) : null
+
+function normalizeRole(value: unknown): Itv3ContributionRole {
+  return value === 'reviewer' ? 'reviewer' : 'annotator'
 }
 
-export function getSummaryRejectedCount(
-  summary: Itv3ContributionRejectionMetrics | null | undefined
-): number {
-  if (!summary) return 0
-  return summary.rejected_count ?? summary.rejection_count ?? 0
+function normalizeOrder(value: unknown): 1 | 2 | 3 | null {
+  return value === 1 || value === 2 || value === 3 ? value : null
 }
 
-export function getSummaryRejectedPercent(
-  summary: Itv3ContributionRejectionMetrics | null | undefined
-): number | undefined {
-  if (!summary) return undefined
-  return summary.rejected_percent ?? summary.rejection_percent
+function normalizeTask(raw: RawRecord): Itv3ContributionTask {
+  return {
+    task_id: toText(raw.task_id),
+    name: toText(raw.name),
+    batch_name: toText(raw.batch_name),
+    updated_time: toText(raw.updated_time),
+    role: normalizeRole(raw.role),
+    order: normalizeOrder(raw.order),
+    rejection_count: toNumber(raw.rejection_count),
+    final_char_count: toNullableNumber(raw.final_char_count),
+    total_char_difference: toNullableNumber(raw.total_char_difference),
+    char_percent_diff: toNullableNumber(raw.char_percent_diff),
+    review_total_char_difference: toNullableNumber(raw.review_total_char_difference),
+    rejections_made: toNullableNumber(raw.rejections_made),
+    own_version_count: toNullableNumber(raw.own_version_count),
+    own_version_sum: toNullableNumber(raw.own_version_sum),
+    selected_option_count: toNullableNumber(raw.selected_option_count),
+    selected_option_sum: toNullableNumber(raw.selected_option_sum),
+    modified_option_count: toNullableNumber(raw.modified_option_count),
+    modified_option_sum: toNullableNumber(raw.modified_option_sum),
+  }
 }
 
-export function getSummaryUnrejectedTasksPercent(
-  summary: Itv3ContributionRejectionMetrics | null | undefined
-): number | undefined {
-  if (!summary) return undefined
-  return summary.unrejected_tasks_percent ?? summary.unrejected_percent
+function normalizeAnnotatorSummary(
+  value: unknown
+): Itv3AnnotatorContributionSummary | null {
+  const raw = asRecord(value)
+  if (!raw) return null
+
+  return {
+    total_count: toNumber(raw.total_count),
+    tasks_annotated: toNumber(raw.tasks_annotated),
+    tasks_reviewed: toNumber(raw.tasks_reviewed),
+    rejected_count: toNumber(raw.rejected_count),
+    rejected_percent: toNumber(raw.rejected_percent),
+    unrejected_tasks_percent: toNumber(raw.unrejected_tasks_percent),
+    final_char_count: toNumber(raw.final_char_count),
+    total_char_difference: toNumber(raw.total_char_difference),
+    char_percent_diff: toNumber(raw.char_percent_diff),
+  }
 }
 
-export function getSummaryRejectionsMadeCount(
-  summary: Itv3RejectionsMadeMetrics | null | undefined
-): number {
-  if (!summary) return 0
-  return summary.rejections_made_count ?? summary.rejections_made ?? 0
+function normalizeReviewerSummary(
+  value: unknown
+): Itv3ReviewerContributionSummary | null {
+  const raw = asRecord(value)
+  if (!raw) return null
+
+  return {
+    total_count: toNumber(raw.total_count),
+    tasks_reviewed: toNumber(raw.tasks_reviewed),
+    final_char_count: toNumber(raw.final_char_count),
+    review_total_char_difference: toNumber(raw.review_total_char_difference),
+    rejections_made_count: toNumber(raw.rejections_made_count),
+    rejections_made_percent: toNumber(raw.rejections_made_percent),
+    unrejected_tasks_percent: toNumber(raw.unrejected_tasks_percent),
+    own_version_count: toNumber(raw.own_version_count),
+    own_version_sum: toNumber(raw.own_version_sum),
+    selected_option_count: toNumber(raw.selected_option_count),
+    selected_option_sum: toNumber(raw.selected_option_sum),
+    modified_option_count: toNumber(raw.modified_option_count),
+    modified_option_sum: toNumber(raw.modified_option_sum),
+  }
 }
 
-export function getSummaryRejectionsMadePercent(
-  summary: (Itv3RejectionsMadeMetrics & Itv3ContributionRejectionMetrics) | null | undefined
-): number | undefined {
-  if (!summary) return undefined
-  return summary.rejections_made_percent
-}
+/**
+ * Normalize the raw contributions payload. Each role block stays independent so
+ * a user who both annotated and reviewed keeps two separate sets of totals.
+ */
+export function normalizeUserContributionReport(
+  response: unknown
+): UserContributionReportResponse {
+  const raw = asRecord(response)
+  if (!raw) return emptyContributionReport()
 
-export function getTaskRejectionsMadeCount(
-  task: { rejections_made_count?: number | null; rejections_made?: number | null } | null | undefined
-): number {
-  if (!task) return 0
-  return task.rejections_made_count ?? task.rejections_made ?? 0
+  const summary = asRecord(raw.contribution_summary)
+  const tasks = Array.isArray(raw.tasks) ? raw.tasks : []
+
+  return {
+    tasks: tasks
+      .map(asRecord)
+      .filter((task): task is RawRecord => task !== null)
+      .map(normalizeTask),
+    contribution_summary: {
+      annotator: normalizeAnnotatorSummary(summary?.annotator),
+      reviewer: normalizeReviewerSummary(summary?.reviewer),
+    },
+  }
 }
 
 export function emptyContributionReport(): UserContributionReportResponse {
@@ -101,16 +152,10 @@ export function formatReportCountSum(
 }
 
 export function getContributionSlotLabelKey(
-  role: UserRole | string | undefined,
-  order: 1 | 2 | 3 | null
+  task: Pick<Itv3ContributionTask, 'role' | 'order'>
 ): 'annotatorA' | 'annotatorB' | 'annotatorC' | 'reviewer' {
-  const normalized = normalizeUserRole(role)
-
-  if (normalized === UserRole.Reviewer || order == null) {
-    return 'reviewer'
-  }
-
-  if (order === 1) return 'annotatorA'
-  if (order === 2) return 'annotatorB'
-  return 'annotatorC'
+  if (task.role === 'reviewer') return 'reviewer'
+  if (task.order === 2) return 'annotatorB'
+  if (task.order === 3) return 'annotatorC'
+  return 'annotatorA'
 }

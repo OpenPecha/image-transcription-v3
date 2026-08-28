@@ -4,9 +4,6 @@ import {
   formatReportNumber,
   formatReportPercent,
   formatReportSignedNumber,
-  getSummaryRejectedCount,
-  getSummaryRejectedPercent,
-  getSummaryUnrejectedTasksPercent,
 } from '@/lib/user-contribution-report'
 import type { AnnotatorContributionRow } from '@/types'
 import { ContributionMetricCell } from './contribution-metric-cell'
@@ -23,38 +20,24 @@ export function AnnotatorContributionTableRow({
   display,
   baseline,
 }: AnnotatorContributionRowProps) {
-  const totalAnnotated = baseline.tasks_annotated ?? baseline.total_count ?? 0
-  const totalReviewed = baseline.tasks_reviewed ?? 0
-  const totalFinalReviewed = baseline.tasks_final_reviewed ?? 0
-
   const annotatedCell: ReactNode = filterActive ? (
     <ContributionMetricCell
-      count={display.tasks_annotated ?? display.total_count ?? 0}
-      denominator={totalAnnotated}
+      count={display.tasks_annotated}
+      denominator={baseline.tasks_annotated}
       filterActive
     />
   ) : (
-    <span className="tabular-nums">{totalAnnotated}</span>
+    <span className="tabular-nums">{baseline.tasks_annotated}</span>
   )
 
   const reviewedCell: ReactNode = filterActive ? (
     <ContributionMetricCell
-      count={display.tasks_reviewed ?? 0}
-      denominator={totalReviewed}
+      count={display.tasks_reviewed}
+      denominator={baseline.tasks_reviewed}
       filterActive
     />
   ) : (
-    <span className="tabular-nums">{totalReviewed}</span>
-  )
-
-  const finalReviewedCell: ReactNode = filterActive ? (
-    <ContributionMetricCell
-      count={display.tasks_final_reviewed ?? 0}
-      denominator={totalFinalReviewed}
-      filterActive
-    />
-  ) : (
-    <span className="tabular-nums">{totalFinalReviewed}</span>
+    <span className="tabular-nums">{baseline.tasks_reviewed}</span>
   )
 
   const row = filterActive ? display : baseline
@@ -66,13 +49,14 @@ export function AnnotatorContributionTableRow({
       </td>
       <td className={cn(contributionTableBodyCellClass, 'text-right')}>{annotatedCell}</td>
       <td className={cn(contributionTableBodyCellClass, 'text-right')}>{reviewedCell}</td>
-      <td className={cn(contributionTableBodyCellClass, 'text-right')}>{finalReviewedCell}</td>
-      <td className={cn(contributionTableBodyCellClass, 'text-right tabular-nums')}>{getSummaryRejectedCount(row)}</td>
       <td className={cn(contributionTableBodyCellClass, 'text-right tabular-nums')}>
-        {formatReportPercent(getSummaryRejectedPercent(row))}
+        {row.rejected_count}
       </td>
       <td className={cn(contributionTableBodyCellClass, 'text-right tabular-nums')}>
-        {formatReportPercent(getSummaryUnrejectedTasksPercent(row))}
+        {formatReportPercent(row.rejected_percent)}
+      </td>
+      <td className={cn(contributionTableBodyCellClass, 'text-right tabular-nums')}>
+        {formatReportPercent(row.unrejected_tasks_percent)}
       </td>
       <td className={cn(contributionTableBodyCellClass, 'text-right tabular-nums')}>
         {formatReportNumber(row.final_char_count)}

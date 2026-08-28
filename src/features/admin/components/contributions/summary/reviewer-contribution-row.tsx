@@ -5,11 +5,6 @@ import {
   formatReportNumber,
   formatReportPercent,
   formatReportSignedNumber,
-  getSummaryRejectedCount,
-  getSummaryRejectedPercent,
-  getSummaryRejectionsMadeCount,
-  getSummaryRejectionsMadePercent,
-  getSummaryUnrejectedTasksPercent,
 } from '@/lib/user-contribution-report'
 import type { ReviewerContributionRow } from '@/types'
 import { ContributionMetricCell } from './contribution-metric-cell'
@@ -26,38 +21,14 @@ export function ReviewerContributionTableRow({
   display,
   baseline,
 }: ReviewerContributionRowProps) {
-  const totalReviewed = baseline.tasks_reviewed ?? baseline.total_count ?? 0
-  const totalReviewedAsR1 = baseline.tasks_reviewed_as_r1 ?? 0
-  const totalFinalReviewed = baseline.tasks_final_reviewed ?? 0
-
   const reviewedCell: ReactNode = filterActive ? (
     <ContributionMetricCell
-      count={display.tasks_reviewed ?? display.total_count ?? 0}
-      denominator={totalReviewed}
+      count={display.tasks_reviewed}
+      denominator={baseline.tasks_reviewed}
       filterActive
     />
   ) : (
-    <span className="tabular-nums">{totalReviewed}</span>
-  )
-
-  const reviewedAsR1Cell: ReactNode = filterActive ? (
-    <ContributionMetricCell
-      count={display.tasks_reviewed_as_r1 ?? 0}
-      denominator={totalReviewedAsR1}
-      filterActive
-    />
-  ) : (
-    <span className="tabular-nums">{totalReviewedAsR1}</span>
-  )
-
-  const finalReviewedCell: ReactNode = filterActive ? (
-    <ContributionMetricCell
-      count={display.tasks_final_reviewed ?? 0}
-      denominator={totalFinalReviewed}
-      filterActive
-    />
-  ) : (
-    <span className="tabular-nums">{totalFinalReviewed}</span>
+    <span className="tabular-nums">{baseline.tasks_reviewed}</span>
   )
 
   const row = filterActive ? display : baseline
@@ -68,35 +39,20 @@ export function ReviewerContributionTableRow({
         {display.username}
       </td>
       <td className={cn(contributionTableBodyCellClass, 'text-right')}>{reviewedCell}</td>
-      <td className={cn(contributionTableBodyCellClass, 'text-right')}>{reviewedAsR1Cell}</td>
-      <td className={cn(contributionTableBodyCellClass, 'text-right')}>{finalReviewedCell}</td>
-      <td className={cn(contributionTableBodyCellClass, 'text-right tabular-nums')}>{getSummaryRejectedCount(row)}</td>
       <td className={cn(contributionTableBodyCellClass, 'text-right tabular-nums')}>
-        {formatReportPercent(getSummaryRejectedPercent(row))}
-      </td>
-      <td className={cn(contributionTableBodyCellClass, 'text-right tabular-nums')}>
-        {formatReportPercent(getSummaryUnrejectedTasksPercent(row))}
-      </td>
-      <td className={cn(contributionTableBodyCellClass, 'text-right tabular-nums')}>
-        {formatReportNumber(row.review_char_count)}
-      </td>
-      <td className={cn(contributionTableBodyCellClass, 'text-right tabular-nums')}>
-        {formatReportSignedNumber(row.review_total_char_difference)}
+        {formatReportPercent(row.unrejected_tasks_percent)}
       </td>
       <td className={cn(contributionTableBodyCellClass, 'text-right tabular-nums')}>
         {formatReportNumber(row.final_char_count)}
       </td>
       <td className={cn(contributionTableBodyCellClass, 'text-right tabular-nums')}>
-        {formatReportSignedNumber(row.total_char_difference)}
+        {formatReportSignedNumber(row.review_total_char_difference)}
       </td>
       <td className={cn(contributionTableBodyCellClass, 'text-right tabular-nums')}>
-        {formatReportPercent(row.char_percent_diff)}
+        {row.rejections_made_count}
       </td>
       <td className={cn(contributionTableBodyCellClass, 'text-right tabular-nums')}>
-        {getSummaryRejectionsMadeCount(row)}
-      </td>
-      <td className={cn(contributionTableBodyCellClass, 'text-right tabular-nums')}>
-        {formatReportPercent(getSummaryRejectionsMadePercent(row))}
+        {formatReportPercent(row.rejections_made_percent)}
       </td>
       <td className={cn(contributionTableBodyCellClass, 'text-right tabular-nums')}>
         {formatReportCountSum(row.own_version_count, row.own_version_sum)}

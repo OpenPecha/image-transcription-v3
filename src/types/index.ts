@@ -10,6 +10,7 @@ export type * from './user'
 
 export type {
   Itv3AnnotatorContributionSummary,
+  Itv3ContributionRole,
   Itv3ContributionSummary,
   Itv3ContributionTask,
   Itv3ReviewerContributionSummary,
