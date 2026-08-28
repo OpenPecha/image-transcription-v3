@@ -45,9 +45,6 @@ export function AnnotatorContributionTable({
               {t('userContributions.tables.annotator.tasksReviewed')}
             </th>
             <th className={cn(contributionTableHeadCellClass, 'text-right')}>
-              {t('userContributions.tables.annotator.tasksFinalReviewed')}
-            </th>
-            <th className={cn(contributionTableHeadCellClass, 'text-right')}>
               {t('userContributions.tables.annotator.rejectedCount')}
             </th>
             <th className={cn(contributionTableHeadCellClass, 'text-right')}>

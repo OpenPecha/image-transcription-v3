@@ -1,80 +1,67 @@
-/** Per-task row from the ITV3 user contributions report endpoint. */
+/** Per-task row from the ITv3 user contributions report endpoint. */
 export interface Itv3ContributionTask {
   task_id: string
   name: string
   batch_name: string
   updated_time: string
-  role: string
+  role: Itv3ContributionRole
+  /** Annotator slot order (1, 2, or 3); null for the reviewer row. */
   order: 1 | 2 | 3 | null
   rejection_count: number
   final_char_count: number | null
+  /** Annotator only: Lev(Ai, accepted review transcript). Null on reviewer rows. */
   total_char_difference: number | null
   char_percent_diff: number | null
-  review_char_count?: number | null
-  review_total_char_difference?: number | null
-  /** @deprecated Use `rejections_made_count` */
-  rejections_made?: number | null
-  rejections_made_count?: number | null
-  own_version_count?: number | null
-  own_version_sum?: number | null
-  selected_option_count?: number | null
-  selected_option_sum?: number | null
-  modified_option_count?: number | null
-  modified_option_sum?: number | null
+  /** Reviewer only: min(Lev(A1, Ri), Lev(A2, Ri), Lev(A3, Ri)). */
+  review_total_char_difference: number | null
+  /** Reviewer only: annotation-slot rejections made on this task. */
+  rejections_made: number | null
+  own_version_count: number | null
+  own_version_sum: number | null
+  selected_option_count: number | null
+  selected_option_sum: number | null
+  modified_option_count: number | null
+  modified_option_sum: number | null
 }
 
-/** Shared rejection / pass-rate fields on contribution summaries (API renamed in 2026-06). */
-export interface Itv3ContributionRejectionMetrics {
-  /** @deprecated Use `rejected_count` */
-  rejection_count?: number
-  rejected_count?: number
-  /** @deprecated Use `rejected_percent` */
-  rejection_percent?: number
-  rejected_percent?: number
-  /** @deprecated Use `unrejected_tasks_percent` */
-  unrejected_percent?: number
-  unrejected_tasks_percent?: number
-}
+export type Itv3ContributionRole = 'annotator' | 'reviewer'
 
-/** Rejections initiated by the user (reviewer). */
-export interface Itv3RejectionsMadeMetrics {
-  /** @deprecated Use `rejections_made_count` */
-  rejections_made?: number
-  rejections_made_count?: number
-  /** @deprecated Use `rejections_made_percent` */
-  rejections_made_percent?: number
-}
-
-export interface Itv3AnnotatorContributionSummary extends Itv3ContributionRejectionMetrics {
+/** Aggregated annotation work for a date range. Absent when the user never annotated. */
+export interface Itv3AnnotatorContributionSummary {
   total_count: number
   tasks_annotated: number
+  /** Annotated tasks that later reached `reviewed`. Not review work by this user. */
   tasks_reviewed: number
-  tasks_final_reviewed: number
+  rejected_count: number
+  rejected_percent: number
+  unrejected_tasks_percent: number
   final_char_count: number
   total_char_difference: number
   char_percent_diff: number
 }
 
-export interface Itv3ReviewerContributionSummary
-  extends Itv3ContributionRejectionMetrics, Itv3RejectionsMadeMetrics {
-  total_count?: number
-  tasks_reviewed?: number
-  /** Tasks reviewed in the reviewer slot. */
-  tasks_reviewed_as_r1?: number
-  tasks_final_reviewed?: number
-  final_char_count?: number
-  total_char_difference?: number
-  char_percent_diff?: number
-  review_char_count?: number
-  review_total_char_difference?: number
-  own_version_count?: number
-  own_version_sum?: number
-  selected_option_count?: number
-  selected_option_sum?: number
-  modified_option_count?: number
-  modified_option_sum?: number
+/** Aggregated review work for a date range. Absent when the user never reviewed. */
+export interface Itv3ReviewerContributionSummary {
+  total_count: number
+  tasks_reviewed: number
+  /** In ITv3 the review transcript is the terminal output, so this is its length. */
+  final_char_count: number
+  review_total_char_difference: number
+  rejections_made_count: number
+  rejections_made_percent: number
+  unrejected_tasks_percent: number
+  own_version_count: number
+  own_version_sum: number
+  selected_option_count: number
+  selected_option_sum: number
+  modified_option_count: number
+  modified_option_sum: number
 }
 
+/**
+ * Role blocks are independent: a user who both annotated and reviewed in the
+ * range gets both, and each is null when that kind of work is absent.
+ */
 export interface Itv3ContributionSummary {
   annotator: Itv3AnnotatorContributionSummary | null
   reviewer: Itv3ReviewerContributionSummary | null

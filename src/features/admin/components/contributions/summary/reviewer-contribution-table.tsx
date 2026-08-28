@@ -32,7 +32,7 @@ export function ReviewerContributionTable({
 
   return (
     <div className={contributionTableWrapperClass}>
-      <table className={cn(contributionTableClass, 'min-w-[1280px]')}>
+      <table className={cn(contributionTableClass, 'min-w-[1024px]')}>
         <thead>
           <tr className="text-left">
             <th className={cn(contributionTableUsernameHeadCellClass, 'text-left')}>
@@ -42,34 +42,13 @@ export function ReviewerContributionTable({
               {t('userContributions.tables.reviewer.tasksReviewed')}
             </th>
             <th className={cn(contributionTableHeadCellClass, 'text-right')}>
-              {t('userContributions.tables.reviewer.tasksReviewedAsR1')}
-            </th>
-            <th className={cn(contributionTableHeadCellClass, 'text-right')}>
-              {t('userContributions.tables.reviewer.tasksFinalReviewed')}
-            </th>
-            <th className={cn(contributionTableHeadCellClass, 'text-right')}>
-              {t('userContributions.tables.reviewer.rejectedCount')}
-            </th>
-            <th className={cn(contributionTableHeadCellClass, 'text-right')}>
-              {t('userContributions.tables.reviewer.rejectedPercent')}
-            </th>
-            <th className={cn(contributionTableHeadCellClass, 'text-right')}>
               {t('userContributions.tables.reviewer.unrejectedPercent')}
-            </th>
-            <th className={cn(contributionTableHeadCellClass, 'text-right')}>
-              {t('userContributions.tables.reviewer.reviewCharCount')}
-            </th>
-            <th className={cn(contributionTableHeadCellClass, 'text-right')}>
-              {t('userContributions.tables.reviewer.reviewCharDiff')}
             </th>
             <th className={cn(contributionTableHeadCellClass, 'text-right')}>
               {t('userContributions.tables.reviewer.finalCharCount')}
             </th>
             <th className={cn(contributionTableHeadCellClass, 'text-right')}>
-              {t('userContributions.tables.reviewer.charDiff')}
-            </th>
-            <th className={cn(contributionTableHeadCellClass, 'text-right')}>
-              {t('userContributions.tables.reviewer.charPercentDiff')}
+              {t('userContributions.tables.reviewer.reviewCharDiff')}
             </th>
             <th className={cn(contributionTableHeadCellClass, 'text-right')}>
               {t('userContributions.tables.reviewer.rejectionsMade')}

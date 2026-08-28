@@ -89,10 +89,15 @@ Admins upload task files and assign batches to groups. New tasks enter
 `pending`. Batch reports summarize `pending`, `annotated_a`, `annotated_b`,
 `annotated`, `reviewed`, and `trashed`; completion percentage uses `reviewed`.
 
-### Temporarily unavailable V3 features
+### Contribution reports
 
-The backend does not yet implement per-user contribution reports for
-`imagetranscriptionv3`. Those admin surfaces show an unavailable notice instead
-of calling V2-only endpoints. Batch task listing, task search, batch CSV export,
-group contribution summaries, per-group batch reports, and task restore are
-available.
+Group summaries and per-user contribution reports are both available. A user is
+reported by the work they actually did, not by their current role: the per-user
+payload carries independent `annotator` and `reviewer` blocks, and someone who
+both annotated and reviewed in the range gets both. Each block is `null` when
+that kind of work is absent. Salary figures must be read per block, since
+annotation is scored against the accepted review transcript while review is
+scored against the three annotations.
+
+Batch task listing, task search, batch CSV export, per-group batch reports, and
+task restore are also available.

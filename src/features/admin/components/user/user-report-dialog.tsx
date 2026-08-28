@@ -12,8 +12,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
-import { AdminFeatureUnavailable } from '@/features/admin/components/admin-feature-unavailable'
-import { ADMIN_FEATURE_AVAILABILITY } from '@/features/admin/lib/admin-feature-availability'
 import { cn } from '@/lib/utils'
 import {
   formatReportCountSum,
@@ -21,17 +19,10 @@ import {
   formatReportPercent,
   formatReportSignedNumber,
   getContributionSlotLabelKey,
-  getContributionSummaryForRole,
-  getTaskRejectionsMadeCount,
 } from '@/lib/user-contribution-report'
 import { useGetUserContributions } from '../../api/user'
 import { UserReportSummary } from './user-report-summary'
-import {
-  UserRole,
-  normalizeUserRole,
-  type Itv3ContributionTask,
-  type User,
-} from '@/types'
+import type { Itv3ContributionTask, User } from '@/types'
 
 interface UserReportDialogProps {
   open: boolean
@@ -66,7 +57,6 @@ const contributionTableHeadCellClass =
 export function UserReportDialog({ open, onOpenChange, user }: UserReportDialogProps) {
   const { t } = useTranslation('admin')
   const defaultRange = useMemo(() => getDefaultDateRange(), [])
-  const normalizedRole = normalizeUserRole(user.role)
 
   const [startDate, setStartDate] = useState(defaultRange.start_date)
   const [endDate, setEndDate] = useState(defaultRange.end_date)
@@ -78,29 +68,15 @@ export function UserReportDialog({ open, onOpenChange, user }: UserReportDialogP
     open
   )
 
-  if (!ADMIN_FEATURE_AVAILABILITY.userContributions) {
-    return (
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>
-              {t('users.report.title')} - {user.username}
-            </DialogTitle>
-            <DialogDescription>{t('users.report.description')}</DialogDescription>
-          </DialogHeader>
-          <AdminFeatureUnavailable
-            title={t('featureAvailability.userContributionsTitle')}
-            description={t('featureAvailability.userContributionsDescription')}
-          />
-        </DialogContent>
-      </Dialog>
-    )
-  }
+  const tasks = useMemo(() => report?.tasks ?? [], [report])
 
-  const tasks = report?.tasks ?? []
-  const roleSummary = getContributionSummaryForRole(
-    report?.contribution_summary,
-    user.role
+  const annotatorTasks = useMemo(
+    () => tasks.filter((task) => task.role === 'annotator'),
+    [tasks]
+  )
+  const reviewerTasks = useMemo(
+    () => tasks.filter((task) => task.role === 'reviewer'),
+    [tasks]
   )
 
   const handleApplyFilter = () => {
@@ -166,19 +142,36 @@ export function UserReportDialog({ open, onOpenChange, user }: UserReportDialogP
 
         <div className="min-h-0 flex-1 overflow-auto pt-4">
           <div className="flex flex-col gap-4">
-            <UserReportSummary role={user.role} summary={roleSummary} isLoading={isLoading} />
+            <UserReportSummary
+              summary={report?.contribution_summary}
+              isLoading={isLoading}
+            />
 
             <h4 className="text-sm font-medium">{t('users.report.contributions')}</h4>
 
-            <div className="rounded-lg border">
-              {isLoading ? (
-                <ContributionsTableSkeleton role={normalizedRole} />
-              ) : tasks.length === 0 ? (
+            {isLoading ? (
+              <div className="rounded-lg border">
+                <ContributionsTableSkeleton colCount={8} />
+              </div>
+            ) : tasks.length === 0 ? (
+              <div className="rounded-lg border">
                 <EmptyContributions />
-              ) : (
-                <ContributionsTable tasks={tasks} role={normalizedRole} />
-              )}
-            </div>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-4">
+                {annotatorTasks.length > 0 ? (
+                  <TaskSection title={t('users.report.summary.annotationSection')}>
+                    <AnnotatorContributionsTable tasks={annotatorTasks} />
+                  </TaskSection>
+                ) : null}
+
+                {reviewerTasks.length > 0 ? (
+                  <TaskSection title={t('users.report.summary.reviewSection')}>
+                    <ReviewerContributionsTable tasks={reviewerTasks} />
+                  </TaskSection>
+                ) : null}
+              </div>
+            )}
           </div>
         </div>
       </DialogContent>
@@ -186,135 +179,155 @@ export function UserReportDialog({ open, onOpenChange, user }: UserReportDialogP
   )
 }
 
-interface ContributionsTableProps {
-  tasks: Itv3ContributionTask[]
-  role: UserRole | undefined
+interface TaskSectionProps {
+  title: string
+  children: React.ReactNode
 }
 
-function ContributionsTable({ tasks, role }: ContributionsTableProps) {
+function TaskSection({ title, children }: TaskSectionProps) {
+  return (
+    <section className="space-y-2">
+      <h5 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+        {title}
+      </h5>
+      <div className="rounded-lg border">{children}</div>
+    </section>
+  )
+}
+
+interface ContributionsTableProps {
+  tasks: Itv3ContributionTask[]
+}
+
+function AnnotatorContributionsTable({ tasks }: ContributionsTableProps) {
   const { t } = useTranslation('admin')
-
-  if (role === UserRole.Annotator) {
-    return (
-      <table className="w-full min-w-max text-sm">
-        <thead>
-          <tr>
-            <th className={cn(contributionTableHeadCellClass, 'text-left')}>
-              {t('users.report.table.imageName')}
-            </th>
-            <th className={cn(contributionTableHeadCellClass, 'text-left')}>
-              {t('users.report.table.batch')}
-            </th>
-            <th className={cn(contributionTableHeadCellClass, 'text-left')}>
-              {t('users.report.table.slot')}
-            </th>
-            <th className={cn(contributionTableHeadCellClass, 'text-right')}>
-              {t('users.report.table.rejections')}
-            </th>
-            <th className={cn(contributionTableHeadCellClass, 'text-right')}>
-              {t('users.report.table.finalChars')}
-            </th>
-            <th className={cn(contributionTableHeadCellClass, 'text-right')}>
-              {t('users.report.table.charDiff')}
-            </th>
-            <th className={cn(contributionTableHeadCellClass, 'text-right')}>
-              {t('users.report.table.percentDiff')}
-            </th>
-            <th className={cn(contributionTableHeadCellClass, 'text-right')}>
-              {t('users.report.table.date')}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {tasks.map((task) => (
-            <AnnotatorContributionRow key={task.task_id} task={task} role={role} />
-          ))}
-        </tbody>
-      </table>
-    )
-  }
-
-  if (role === UserRole.Reviewer) {
-    return (
-      <table className="w-full min-w-max text-sm">
-        <thead>
-          <tr>
-            <th className={cn(contributionTableHeadCellClass, 'text-left')}>
-              {t('users.report.table.imageName')}
-            </th>
-            <th className={cn(contributionTableHeadCellClass, 'text-left')}>
-              {t('users.report.table.batch')}
-            </th>
-            <th className={cn(contributionTableHeadCellClass, 'text-left')}>
-              {t('users.report.table.slot')}
-            </th>
-            <th className={cn(contributionTableHeadCellClass, 'text-right')}>
-              {t('users.report.table.rejections')}
-            </th>
-            <th className={cn(contributionTableHeadCellClass, 'text-right')}>
-              {t('users.report.summary.rejectionsMade')}
-            </th>
-            <th className={cn(contributionTableHeadCellClass, 'text-right')}>
-              {t('users.report.table.reviewChars')}
-            </th>
-            <th className={cn(contributionTableHeadCellClass, 'text-right')}>
-              {t('users.report.table.reviewCharDiff')}
-            </th>
-            <th className={cn(contributionTableHeadCellClass, 'text-right')}>
-              {t('users.report.table.finalChars')}
-            </th>
-            <th className={cn(contributionTableHeadCellClass, 'text-right')}>
-              {t('users.report.table.charDiff')}
-            </th>
-            <th className={cn(contributionTableHeadCellClass, 'text-right')}>
-              {t('users.report.table.percentDiff')}
-            </th>
-            <th className={cn(contributionTableHeadCellClass, 'text-right')}>
-              {t('users.report.table.ownVersion')}
-            </th>
-            <th className={cn(contributionTableHeadCellClass, 'text-right')}>
-              {t('users.report.table.selectedOption')}
-            </th>
-            <th className={cn(contributionTableHeadCellClass, 'text-right')}>
-              {t('users.report.table.modifiedOption')}
-            </th>
-            <th className={cn(contributionTableHeadCellClass, 'text-right')}>
-              {t('users.report.table.date')}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {tasks.map((task) => (
-            <ReviewerContributionRow key={task.task_id} task={task} role={role} />
-          ))}
-        </tbody>
-      </table>
-    )
-  }
 
   return (
     <table className="w-full min-w-max text-sm">
       <thead>
         <tr>
-          <th className={cn(contributionTableHeadCellClass, 'px-3 py-2 text-left')}>
+          <th className={cn(contributionTableHeadCellClass, 'text-left')}>
             {t('users.report.table.imageName')}
           </th>
-          <th className={cn(contributionTableHeadCellClass, 'px-3 py-2 text-left')}>
+          <th className={cn(contributionTableHeadCellClass, 'text-left')}>
             {t('users.report.table.batch')}
           </th>
-          <th className={cn(contributionTableHeadCellClass, 'px-3 py-2 text-right')}>
+          <th className={cn(contributionTableHeadCellClass, 'text-left')}>
+            {t('users.report.table.slot')}
+          </th>
+          <th className={cn(contributionTableHeadCellClass, 'text-right')}>
+            {t('users.report.table.rejections')}
+          </th>
+          <th className={cn(contributionTableHeadCellClass, 'text-right')}>
+            {t('users.report.table.finalChars')}
+          </th>
+          <th className={cn(contributionTableHeadCellClass, 'text-right')}>
+            {t('users.report.table.charDiff')}
+          </th>
+          <th className={cn(contributionTableHeadCellClass, 'text-right')}>
+            {t('users.report.table.percentDiff')}
+          </th>
+          <th className={cn(contributionTableHeadCellClass, 'text-right')}>
             {t('users.report.table.date')}
           </th>
         </tr>
       </thead>
       <tbody>
         {tasks.map((task) => (
-          <tr key={task.task_id} className="border-t hover:bg-muted/30 transition-colors">
+          <tr key={task.task_id} className="border-t transition-colors hover:bg-muted/30">
             <td className="max-w-[220px] truncate px-4 py-2.5" title={task.name}>
               {task.name}
             </td>
             <td className="px-4 py-2.5">
               <BatchBadge name={task.batch_name} />
+            </td>
+            <td className="px-4 py-2.5 text-xs">
+              {t(`users.report.table.slots.${getContributionSlotLabelKey(task)}`)}
+            </td>
+            <td className="px-4 py-2.5 text-right font-mono text-xs">
+              <RejectionCell count={task.rejection_count} />
+            </td>
+            <td className="px-4 py-2.5 text-right font-mono text-xs">
+              {formatReportNumber(task.final_char_count)}
+            </td>
+            <td className="px-4 py-2.5 text-right font-mono text-xs">
+              {formatReportSignedNumber(task.total_char_difference)}
+            </td>
+            <td className="px-4 py-2.5 text-right font-mono text-xs">
+              {formatReportPercent(task.char_percent_diff)}
+            </td>
+            <td className="px-4 py-2.5 text-right text-xs text-muted-foreground">
+              {formatDateTime(task.updated_time)}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  )
+}
+
+function ReviewerContributionsTable({ tasks }: ContributionsTableProps) {
+  const { t } = useTranslation('admin')
+
+  return (
+    <table className="w-full min-w-max text-sm">
+      <thead>
+        <tr>
+          <th className={cn(contributionTableHeadCellClass, 'text-left')}>
+            {t('users.report.table.imageName')}
+          </th>
+          <th className={cn(contributionTableHeadCellClass, 'text-left')}>
+            {t('users.report.table.batch')}
+          </th>
+          <th className={cn(contributionTableHeadCellClass, 'text-right')}>
+            {t('users.report.summary.rejectionsMade')}
+          </th>
+          <th className={cn(contributionTableHeadCellClass, 'text-right')}>
+            {t('users.report.table.finalChars')}
+          </th>
+          <th className={cn(contributionTableHeadCellClass, 'text-right')}>
+            {t('users.report.table.reviewCharDiff')}
+          </th>
+          <th className={cn(contributionTableHeadCellClass, 'text-right')}>
+            {t('users.report.table.ownVersion')}
+          </th>
+          <th className={cn(contributionTableHeadCellClass, 'text-right')}>
+            {t('users.report.table.selectedOption')}
+          </th>
+          <th className={cn(contributionTableHeadCellClass, 'text-right')}>
+            {t('users.report.table.modifiedOption')}
+          </th>
+          <th className={cn(contributionTableHeadCellClass, 'text-right')}>
+            {t('users.report.table.date')}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {tasks.map((task) => (
+          <tr key={task.task_id} className="border-t transition-colors hover:bg-muted/30">
+            <td className="max-w-[220px] truncate px-4 py-2.5" title={task.name}>
+              {task.name}
+            </td>
+            <td className="px-4 py-2.5">
+              <BatchBadge name={task.batch_name} />
+            </td>
+            <td className="px-4 py-2.5 text-right font-mono text-xs">
+              <RejectionCell count={task.rejections_made ?? 0} />
+            </td>
+            <td className="px-4 py-2.5 text-right font-mono text-xs">
+              {formatReportNumber(task.final_char_count)}
+            </td>
+            <td className="px-4 py-2.5 text-right font-mono text-xs">
+              {formatReportSignedNumber(task.review_total_char_difference)}
+            </td>
+            <td className="px-4 py-2.5 text-right font-mono text-xs">
+              {formatReportCountSum(task.own_version_count, task.own_version_sum)}
+            </td>
+            <td className="px-4 py-2.5 text-right font-mono text-xs">
+              {formatReportCountSum(task.selected_option_count, task.selected_option_sum)}
+            </td>
+            <td className="px-4 py-2.5 text-right font-mono text-xs">
+              {formatReportCountSum(task.modified_option_count, task.modified_option_sum)}
             </td>
             <td className="px-4 py-2.5 text-right text-xs text-muted-foreground">
               {formatDateTime(task.updated_time)}
@@ -339,106 +352,7 @@ function RejectionCell({ count }: { count: number }) {
     return <span className="text-muted-foreground">0</span>
   }
 
-  return (
-    <span className="font-semibold tabular-nums text-[rgb(255,1,1)]">{count}</span>
-  )
-}
-
-interface ContributionRowProps {
-  task: Itv3ContributionTask
-  role: UserRole
-}
-
-function AnnotatorContributionRow({ task, role }: ContributionRowProps) {
-  const { t } = useTranslation('admin')
-  const slotKey =
-    task.order != null
-      ? getContributionSlotLabelKey(role, task.order)
-      : 'annotatorA'
-
-  return (
-    <tr className="border-t transition-colors hover:bg-muted/30">
-      <td className="max-w-[220px] truncate px-4 py-2.5" title={task.name}>
-        {task.name}
-      </td>
-      <td className="px-4 py-2.5">
-        <BatchBadge name={task.batch_name} />
-      </td>
-      <td className="px-4 py-2.5 text-xs">
-        {t(`users.report.table.slots.${slotKey}`)}
-      </td>
-      <td className="px-4 py-2.5 text-right font-mono text-xs">
-        <RejectionCell count={task.rejection_count} />
-      </td>
-      <td className="px-4 py-2.5 text-right font-mono text-xs">
-        {formatReportNumber(task.final_char_count)}
-      </td>
-      <td className="px-4 py-2.5 text-right font-mono text-xs">
-        {formatReportSignedNumber(task.total_char_difference)}
-      </td>
-      <td className="px-4 py-2.5 text-right font-mono text-xs">
-        {formatReportPercent(task.char_percent_diff)}
-      </td>
-      <td className="px-4 py-2.5 text-right text-xs text-muted-foreground">
-        {formatDateTime(task.updated_time)}
-      </td>
-    </tr>
-  )
-}
-
-function ReviewerContributionRow({ task, role }: ContributionRowProps) {
-  const { t } = useTranslation('admin')
-  const slotKey =
-    task.order != null
-      ? getContributionSlotLabelKey(role, task.order)
-      : 'reviewer'
-
-  return (
-    <tr className="border-t transition-colors hover:bg-muted/30">
-      <td className="max-w-[220px] truncate px-4 py-2.5" title={task.name}>
-        {task.name}
-      </td>
-      <td className="px-4 py-2.5">
-        <BatchBadge name={task.batch_name} />
-      </td>
-      <td className="px-4 py-2.5 text-xs">
-        {t(`users.report.table.slots.${slotKey}`)}
-      </td>
-      <td className="px-4 py-2.5 text-right font-mono text-xs">
-        <RejectionCell count={task.rejection_count} />
-      </td>
-      <td className="px-4 py-2.5 text-right font-mono text-xs">
-        <RejectionCell count={getTaskRejectionsMadeCount(task)} />
-      </td>
-      <td className="px-4 py-2.5 text-right font-mono text-xs">
-        {formatReportNumber(task.review_char_count)}
-      </td>
-      <td className="px-4 py-2.5 text-right font-mono text-xs">
-        {formatReportSignedNumber(task.review_total_char_difference)}
-      </td>
-      <td className="px-4 py-2.5 text-right font-mono text-xs">
-        {formatReportNumber(task.final_char_count)}
-      </td>
-      <td className="px-4 py-2.5 text-right font-mono text-xs">
-        {formatReportSignedNumber(task.total_char_difference)}
-      </td>
-      <td className="px-4 py-2.5 text-right font-mono text-xs">
-        {formatReportPercent(task.char_percent_diff)}
-      </td>
-      <td className="px-4 py-2.5 text-right font-mono text-xs">
-        {formatReportCountSum(task.own_version_count, task.own_version_sum)}
-      </td>
-      <td className="px-4 py-2.5 text-right font-mono text-xs">
-        {formatReportCountSum(task.selected_option_count, task.selected_option_sum)}
-      </td>
-      <td className="px-4 py-2.5 text-right font-mono text-xs">
-        {formatReportCountSum(task.modified_option_count, task.modified_option_sum)}
-      </td>
-      <td className="px-4 py-2.5 text-right text-xs text-muted-foreground">
-        {formatDateTime(task.updated_time)}
-      </td>
-    </tr>
-  )
+  return <span className="font-semibold tabular-nums text-[rgb(255,1,1)]">{count}</span>
 }
 
 function EmptyContributions() {
@@ -457,13 +371,13 @@ function EmptyContributions() {
   )
 }
 
-function ContributionsTableSkeleton({ role }: { role: UserRole | undefined }) {
-  const colCount =
-    role === UserRole.Annotator ? 8 : role === UserRole.Reviewer ? 14 : 3
-
+function ContributionsTableSkeleton({ colCount }: { colCount: number }) {
   return (
     <div className="space-y-0">
-      <div className={cn('grid gap-4 bg-muted/50 px-3 py-2')} style={{ gridTemplateColumns: `repeat(${colCount}, minmax(0, 1fr))` }}>
+      <div
+        className="grid gap-4 bg-muted/50 px-3 py-2"
+        style={{ gridTemplateColumns: `repeat(${colCount}, minmax(0, 1fr))` }}
+      >
         {[...Array(colCount)].map((_, i) => (
           <Skeleton key={i} className="h-4 w-full" />
         ))}
