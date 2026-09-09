@@ -14,6 +14,14 @@ export type BatchExportApiResponse = {
   tasks?: BatchExportTaskApiFields[] | null
 }
 
+function nullableString(value: string | null | undefined): string | null {
+  return value ?? null
+}
+
+function nullableNumber(value: number | null | undefined): number | null {
+  return value ?? null
+}
+
 function resolveFinalTranscript(raw: BatchExportTaskApiFields): string | null {
   return raw.final_transcript ?? raw.review_transcript ?? null
 }
@@ -26,14 +34,34 @@ export function normalizeBatchExportTask(raw: BatchExportTaskApiFields): BatchEx
     orientation: raw.orientation,
     state: raw.state,
     final_transcript: resolveFinalTranscript(raw),
-    final_char_count: raw.final_char_count ?? null,
-    annotator_1_total_char_difference: raw.annotator_1_total_char_difference ?? null,
-    annotator_1_char_percent_diff: raw.annotator_1_char_percent_diff ?? null,
-    annotator_2_total_char_difference: raw.annotator_2_total_char_difference ?? null,
-    annotator_2_char_percent_diff: raw.annotator_2_char_percent_diff ?? null,
-    annotator_3_total_char_difference: raw.annotator_3_total_char_difference ?? null,
-    annotator_3_char_percent_diff: raw.annotator_3_char_percent_diff ?? null,
-    reviewer_total_char_difference: raw.reviewer_total_char_difference ?? null,
+    annotator_1_text: nullableString(raw.annotator_1_text),
+    annotator_2_text: nullableString(raw.annotator_2_text),
+    annotator_3_text: nullableString(raw.annotator_3_text),
+    annotator_1_assigned: nullableString(raw.annotator_1_assigned),
+    annotator_1_submitted: nullableString(raw.annotator_1_submitted),
+    annotator_2_assigned: nullableString(raw.annotator_2_assigned),
+    annotator_2_submitted: nullableString(raw.annotator_2_submitted),
+    annotator_3_assigned: nullableString(raw.annotator_3_assigned),
+    annotator_3_submitted: nullableString(raw.annotator_3_submitted),
+    reviewer_assigned: nullableString(raw.reviewer_assigned),
+    reviewer_submitted: nullableString(raw.reviewer_submitted),
+    annotation_a_rejection_count: nullableNumber(raw.annotation_a_rejection_count),
+    annotation_b_rejection_count: nullableNumber(raw.annotation_b_rejection_count),
+    annotation_c_rejection_count: nullableNumber(raw.annotation_c_rejection_count),
+    changed_assignee_slots: nullableString(raw.changed_assignee_slots),
+    final_char_count: nullableNumber(raw.final_char_count),
+    annotator_1_total_char_difference: nullableNumber(raw.annotator_1_total_char_difference),
+    annotator_1_char_percent_diff: nullableNumber(raw.annotator_1_char_percent_diff),
+    annotator_2_total_char_difference: nullableNumber(raw.annotator_2_total_char_difference),
+    annotator_2_char_percent_diff: nullableNumber(raw.annotator_2_char_percent_diff),
+    annotator_3_total_char_difference: nullableNumber(raw.annotator_3_total_char_difference),
+    annotator_3_char_percent_diff: nullableNumber(raw.annotator_3_char_percent_diff),
+    reviewer_total_char_difference: nullableNumber(raw.reviewer_total_char_difference),
+    annotator_group_similarity_ratio: nullableNumber(raw.annotator_group_similarity_ratio),
+    annotator_group_diff_percentage: nullableNumber(raw.annotator_group_diff_percentage),
+    annotator_group_min_similarity_ratio: nullableNumber(
+      raw.annotator_group_min_similarity_ratio
+    ),
   }
 }
 
