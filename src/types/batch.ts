@@ -15,6 +15,21 @@ export type BatchExportTask = {
   state: BatchTaskState
   /** Normalized; API may send `review_transcript` (ITv3). */
   final_transcript: string | null
+  annotator_1_text: string | null
+  annotator_2_text: string | null
+  annotator_3_text: string | null
+  annotator_1_assigned: string | null
+  annotator_1_submitted: string | null
+  annotator_2_assigned: string | null
+  annotator_2_submitted: string | null
+  annotator_3_assigned: string | null
+  annotator_3_submitted: string | null
+  reviewer_assigned: string | null
+  reviewer_submitted: string | null
+  annotation_a_rejection_count: number | null
+  annotation_b_rejection_count: number | null
+  annotation_c_rejection_count: number | null
+  changed_assignee_slots: string | null
   /** Metrics below are only populated for `reviewed` tasks with stored metrics. */
   final_char_count: number | null
   annotator_1_total_char_difference: number | null
@@ -24,6 +39,9 @@ export type BatchExportTask = {
   annotator_3_total_char_difference: number | null
   annotator_3_char_percent_diff: number | null
   reviewer_total_char_difference: number | null
+  annotator_group_similarity_ratio: number | null
+  annotator_group_diff_percentage: number | null
+  annotator_group_min_similarity_ratio: number | null
 }
 
 // Response from batch export endpoint
