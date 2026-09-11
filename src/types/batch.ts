@@ -15,9 +15,13 @@ export type BatchExportTask = {
   state: BatchTaskState
   /** Normalized; API may send `review_transcript` (ITv3). */
   final_transcript: string | null
+  annotator_1_id: string | null
   annotator_1_text: string | null
+  annotator_2_id: string | null
   annotator_2_text: string | null
+  annotator_3_id: string | null
   annotator_3_text: string | null
+  reviewer_id: string | null
   annotator_1_assigned: string | null
   annotator_1_submitted: string | null
   annotator_2_assigned: string | null

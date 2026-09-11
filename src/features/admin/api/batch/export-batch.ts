@@ -11,7 +11,7 @@ import type { BatchExportResponse } from '@/types'
  *
  * @param batchId - The batch ID to export
  * @returns Promise with batch name and tasks (file, image, orientation, state,
- *          transcripts, times, rejections, and reviewed-task character metrics)
+ *          slot user IDs, transcripts, times, rejections, and reviewed-task character metrics)
  */
 export const exportBatch = async (batchId: string): Promise<BatchExportResponse> => {
   const response = (await apiClient.get(
